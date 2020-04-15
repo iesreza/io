@@ -1,0 +1,15 @@
+package io
+
+import "github.com/alexflint/go-arg"
+
+type args struct {
+	Config  string `arg:"env" help:"Configuration path" default:"config.yml"`
+}
+var Arg args
+func (args) Version() string {
+	return config.App.Name
+}
+func parseArgs()  {
+	arg.MustParse(&Arg)
+
+}

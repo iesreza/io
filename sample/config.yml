@@ -1,0 +1,79 @@
+# App configurations
+app:
+  name: "IO Sample"
+  language: en-GB
+  static: ./httpdocs
+  session-age: 60
+
+  #0 to 4
+  strong-pass-level: 0
+
+jwt:
+  secret: "a.random.public.key"
+  issuer: "io"
+  audience: ["*"]
+  age: 24h
+  subject: "IO App"
+
+# Server configurations
+server:
+  host: "0.0.0.0"
+  port:  "80"
+  https: false
+  cert:  cert.pem
+  key:   key.pem
+  name:  "IO"
+  strict-routing: false
+  case-sensitive: false
+  max-upload-size: 5M
+  request-id: true
+  debug: true
+  recover: false
+
+# Database credentials
+database:
+  enabled: true
+  type: "sqlite"
+  server: ""
+  database: "database.sqlite3"
+  user: "admin"
+  pass: "super-pedro-1980"
+  cache: true
+  cache-size: 1000
+  debug: true
+  ssl-mode: "disable"
+  max-open-connections: 100
+  max-idle-connections: 10
+  connection-max-lifetime: 1h
+
+#Log to file
+log:
+  writefile: true
+  size: 5
+  age: 7
+  level: debug
+  path: ./logs
+
+#Tweaks
+tweaks:
+  ballast: true
+  ballast-size: 100mb
+  processors: 0
+  prefork: false
+
+#Cross Origin Resource Sharing
+cors:
+  enabled: true
+  allowed-origins: ["*"]
+  allowed-methods: ["GET","POST","HEAD","OPTION","PUT","PATCH","DELETE"]
+  allowed-credentials: true
+  allowed-headers: ["*"]
+  max-age: 0
+
+#Rate Limiter
+ratelimit:
+  enabled: false
+  duration: 10
+  requests: 10
+
+
