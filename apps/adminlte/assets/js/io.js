@@ -14,7 +14,6 @@ IO.Init = function(){
 IO.defaultAjaxAttributes = {dataType:"JSON", data:[], type:"POST", error:function (error) { if(IO.onAjaxError != undefined) IO.onAjaxError(error);}}
 IO.Ajax = function(params){
     params = IO.Assign({},IO.defaultAjaxAttributes,params)
-    console.warn(JSON.stringify(params))
     $.ajax(params)
 }
 
