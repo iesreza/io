@@ -2,6 +2,7 @@ package io
 
 import (
 	"bytes"
+	"encoding/json"
 	"github.com/CloudyKit/jet"
 	"github.com/gofiber/fiber"
 	"github.com/gofiber/session"
@@ -22,8 +23,12 @@ type Request struct {
 	JWT       *jwt.Payload
 	User      *user.User
 	Response  Response
+	flashes   []flash
 }
-
+type flash struct {
+	Type    string
+	Message string
+}
 type Response struct {
 	Success bool        `json:"success"`
 	Message string      `json:"message"`
@@ -42,11 +47,14 @@ func Upgrade(ctx *fiber.Ctx) *Request {
 	r.Context = ctx
 	r.Response = Response{}
 	r.Response.Error = e.Errors{}
+
 	if r.Cookies("access_token") != "" {
 		token, err := jwt.Verify(r.Cookies("access_token"))
 		if err == nil {
 			r.JWT = &token
+			r.User = getUser(&token)
 		} else {
+			r.SetCookie("access_token", "")
 			r.Status(http.StatusUnauthorized)
 			r.Send("invalid JWT token")
 			log.Error(err)
@@ -54,14 +62,44 @@ func Upgrade(ctx *fiber.Ctx) *Request {
 	} else {
 		r.JWT = &jwt.Payload{Empty: true, Data: map[string]interface{}{}}
 	}
-	r.User = getUser(&r)
+	if r.User == nil {
+		r.User = &user.User{Anonymous: true}
+	}
 	return &r
 }
 
-func getUser(request *Request) *user.User {
+func getUser(payload *jwt.Payload) *user.User {
+	var user user.User
 	// return user using jwt
-	log.Warning("implement getUser")
-	return &user.User{}
+	if payload.Data != nil {
+		if id, ok := payload.Data["id"]; ok {
+			Database.Where("id = ?", id).Take(&user)
+			if user.ID == 0 {
+				user.Anonymous = true
+			}
+		}
+	}
+
+	return &user
+}
+
+func (r *Request) Flash(params ...string) {
+	if len(params) == 0 {
+		return
+	}
+	if len(r.flashes) == 0 {
+		cookie := r.Cookies("flash")
+		if cookie != "" {
+			json.Unmarshal([]byte(cookie), &r.flashes)
+		}
+	}
+	if len(params) == 1 {
+		r.flashes = append(r.flashes, flash{"info", params[0]})
+
+	} else {
+		r.flashes = append(r.flashes, flash{params[0], params[1]})
+	}
+	r.SetCookie("flash", r.flashes)
 }
 
 func (r *Request) Persist() {
@@ -95,13 +133,20 @@ func (r *Request) View(data map[string]interface{}, views ...string) {
 
 func (r *Request) RenderView(data map[string]interface{}, views ...string) *bytes.Buffer {
 	var buff bytes.Buffer
-	if data == nil {
-		data = map[string]interface{}{}
-	}
 	vars := jet.VarMap{}
 	vars.Set("base", r.Context.Protocol()+"://"+r.Context.Hostname())
 	vars.Set("proto", r.Context.Protocol())
 	vars.Set("hostname", r.Context.Hostname())
+	vars.Set("request", r)
+	if data != nil {
+		for k, v := range data {
+			vars.Set(k, v)
+		}
+	}
+	for k, v := range r.Variables {
+		vars.Set(k, v)
+	}
+
 	for _, view := range views {
 		buff = bytes.Buffer{}
 		parts := strings.Split(view, ".")
@@ -109,7 +154,10 @@ func (r *Request) RenderView(data map[string]interface{}, views ...string) *byte
 		if len(parts) > 1 {
 			t, err := GetView(parts[0], strings.Join(parts[1:], "."))
 			if err == nil {
-				t.Execute(&buff, vars, data)
+				t.Execute(&buff, vars, map[string]interface{}{})
+			} else {
+				log.Error(err)
+				log.Error(parts)
 			}
 			vars.Set("body", buff.Bytes())
 
@@ -208,4 +256,8 @@ func (r *Request) Throw(e *e.Error) {
 
 func (r *Request) HasError() bool {
 	return r.Response.Error.Exist()
+}
+
+func (r *Request) Var(key string, value interface{}) {
+	r.Variables[key] = value
 }

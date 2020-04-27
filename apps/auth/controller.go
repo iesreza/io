@@ -33,8 +33,10 @@ type Response struct {
 func GetUserByID(id interface{}) *user.User {
 	user := user.User{}
 	if db.Where("id = ?", id).Find(&user).RecordNotFound() {
-		return nil
+		user.Anonymous = true
+		return &user
 	}
+
 	return &user
 }
 
@@ -118,8 +120,10 @@ func (c Controller) Login(ctx *fiber.Ctx) {
 		break
 	case "json":
 		if err != nil {
+
 			r.WriteResponse(e.Field("form", "provided credentials is not valid"), err)
 		} else {
+			r.SetCookie("access_token", token)
 			r.WriteResponse(true, "", token)
 		}
 		break
@@ -138,8 +142,13 @@ func (c Controller) Login(ctx *fiber.Ctx) {
 }
 
 func (c Controller) CreateUser(ctx *fiber.Ctx) {
-	//TODO: Check permission
+
 	var r = io.Upgrade(ctx)
+	fmt.Println(r.User.Roles)
+	if !r.User.HasPerm("auth.create.user") {
+		r.WriteResponse(constant.ERROR_UNAUTHORIZED)
+		return
+	}
 	var user = user.User{}
 	err := r.BodyParser(&user)
 
@@ -163,9 +172,12 @@ func (c Controller) CreateUser(ctx *fiber.Ctx) {
 }
 
 func (c Controller) CreateRole(ctx *fiber.Ctx) {
-	//TODO: Check permission
 	var r = io.Upgrade(ctx)
 	var role = user.Role{}
+	if !r.User.HasPerm("auth.create.role") {
+		r.WriteResponse(constant.ERROR_UNAUTHORIZED)
+		return
+	}
 	err := r.BodyParser(&role)
 	if err != nil {
 		r.WriteResponse(constant.ERROR_FORM_PARSE)
@@ -188,9 +200,12 @@ func (c Controller) CreateRole(ctx *fiber.Ctx) {
 }
 
 func (c Controller) CreateGroup(ctx *fiber.Ctx) {
-	//TODO: Check permission
 	var r = io.Upgrade(ctx)
 	var group = user.Group{}
+	if !r.User.HasPerm("auth.create.group") {
+		r.WriteResponse(constant.ERROR_UNAUTHORIZED)
+		return
+	}
 	err := r.BodyParser(&group)
 	if err != nil {
 		r.WriteResponse(constant.ERROR_FORM_PARSE)
@@ -208,8 +223,11 @@ func (c Controller) CreateGroup(ctx *fiber.Ctx) {
 }
 
 func (c Controller) EditUser(ctx *fiber.Ctx) {
-	//TODO: Check permission
 	var r = io.Upgrade(ctx)
+	if !r.User.HasPerm("auth.edit.user") {
+		r.WriteResponse(constant.ERROR_UNAUTHORIZED)
+		return
+	}
 	var user user.User
 	var id = T.Must(r.Params("id")).UInt()
 	if db.Where("id = ?", id).Find(&user).RecordNotFound() {
@@ -239,8 +257,11 @@ func (c Controller) EditUser(ctx *fiber.Ctx) {
 }
 
 func (c Controller) EditRole(ctx *fiber.Ctx) {
-	//TODO: Check permission
 	var r = io.Upgrade(ctx)
+	if !r.User.HasPerm("auth.edit.role") {
+		r.WriteResponse(constant.ERROR_UNAUTHORIZED)
+		return
+	}
 	var role user.Role
 	var id = r.Params("id")
 
@@ -267,14 +288,18 @@ func (c Controller) EditRole(ctx *fiber.Ctx) {
 }
 
 func (c Controller) EditGroup(ctx *fiber.Ctx) {
-	//TODO: Check permission
 	var r = io.Upgrade(ctx)
+	if !r.User.HasPerm("auth.edit.group") {
+		r.WriteResponse(constant.ERROR_UNAUTHORIZED)
+		return
+	}
 	var group user.Group
 	var id = r.Params("id")
 	if db.Where("id = ? OR code_name = ?", id, id).Find(&group).RecordNotFound() {
 		r.WriteResponse(e.Field("id", constant.ERROR_INVALID_ID))
 		return
 	}
+
 	var gid = group.ID
 	err := r.BodyParser(&group)
 	if err != nil {
@@ -294,9 +319,13 @@ func (c Controller) EditGroup(ctx *fiber.Ctx) {
 }
 
 func (c Controller) GetGroups(ctx *fiber.Ctx) {
+	r := io.Upgrade(ctx)
+	if !r.User.HasPerm("auth.group.view") {
+		r.WriteResponse(constant.ERROR_UNAUTHORIZED)
+		return
+	}
 	var groups []user.Group
 	err := db.Find(&groups).Error
-	r := io.Upgrade(ctx)
 	if err != nil {
 		r.WriteResponse(e.Field("id", constant.ERROR_INVALID_ID))
 	} else {
@@ -305,9 +334,13 @@ func (c Controller) GetGroups(ctx *fiber.Ctx) {
 }
 
 func (c Controller) GetGroup(ctx *fiber.Ctx) {
+	r := io.Upgrade(ctx)
+	if !r.User.HasPerm("auth.group.view") {
+		r.WriteResponse(constant.ERROR_UNAUTHORIZED)
+		return
+	}
 	var group user.Group
 	var id = ctx.Params("id")
-	r := io.Upgrade(ctx)
 	if db.Where("id = ? OR code_name = ?", id, id).Find(&group).RecordNotFound() {
 		r.WriteResponse(e.Field("id", constant.ERROR_INVALID_ID))
 		return
@@ -317,9 +350,13 @@ func (c Controller) GetGroup(ctx *fiber.Ctx) {
 }
 
 func (c Controller) GetRoles(ctx *fiber.Ctx) {
+	r := io.Upgrade(ctx)
+	if !r.User.HasPerm("auth.role.view") {
+		r.WriteResponse(constant.ERROR_UNAUTHORIZED)
+		return
+	}
 	var roles []user.Role
 	err := db.Find(&roles).Error
-	r := io.Upgrade(ctx)
 	if err != nil {
 		r.WriteResponse(err)
 	} else {
@@ -328,9 +365,13 @@ func (c Controller) GetRoles(ctx *fiber.Ctx) {
 }
 
 func (c Controller) GetRole(ctx *fiber.Ctx) {
+	r := io.Upgrade(ctx)
+	if !r.User.HasPerm("auth.role.view") {
+		r.WriteResponse(constant.ERROR_UNAUTHORIZED)
+		return
+	}
 	var role user.Role
 	var id = ctx.Params("id")
-	r := io.Upgrade(ctx)
 	if db.Where("id = ? OR code_name = ?", id, id).Find(&role).RecordNotFound() {
 		r.WriteResponse(e.Field("id", constant.ERROR_INVALID_ID))
 		return
@@ -340,9 +381,13 @@ func (c Controller) GetRole(ctx *fiber.Ctx) {
 }
 
 func (c Controller) GetRoleGroups(ctx *fiber.Ctx) {
+	r := io.Upgrade(ctx)
+	if !r.User.HasPerm("auth.role.view") {
+		r.WriteResponse(constant.ERROR_UNAUTHORIZED)
+		return
+	}
 	var role user.Role
 	var id = ctx.Params("id")
-	r := io.Upgrade(ctx)
 	if db.Where("id = ? OR code_name = ?", id, id).Find(&role).RecordNotFound() {
 		r.WriteResponse(e.Field("id", constant.ERROR_INVALID_ID))
 		return
@@ -354,9 +399,13 @@ func (c Controller) GetRoleGroups(ctx *fiber.Ctx) {
 }
 
 func (c Controller) GetUser(ctx *fiber.Ctx) {
+	r := io.Upgrade(ctx)
+	if !r.User.HasPerm("auth.user.view") {
+		r.WriteResponse(constant.ERROR_UNAUTHORIZED)
+		return
+	}
 	var user user.User
 	var id = ctx.Params("id")
-	r := io.Upgrade(ctx)
 	if db.Where("id = ? OR username = ? OR email = ?", id, id, id).Find(&user).RecordNotFound() {
 		r.WriteResponse(constant.ERROR_OBJECT_NOT_EXIST)
 		return
@@ -371,9 +420,13 @@ func (c Controller) GetMe(ctx *fiber.Ctx) {
 }
 
 func (c Controller) GetAllUsers(ctx *fiber.Ctx) {
+	r := io.Upgrade(ctx)
+	if !r.User.HasPerm("auth.user.view") {
+		r.WriteResponse(constant.ERROR_UNAUTHORIZED)
+		return
+	}
 	var users []user.User
 	err := db.Offset(ctx.Params("offset")).Limit(ctx.Params("limit")).Find(&users).Error
-	r := io.Upgrade(ctx)
 	if err != nil {
 		r.WriteResponse(err)
 	} else {
@@ -382,9 +435,13 @@ func (c Controller) GetAllUsers(ctx *fiber.Ctx) {
 }
 
 func (c Controller) GetAllPermissions(ctx *fiber.Ctx) {
+	r := io.Upgrade(ctx)
+	if !r.User.HasPerm("auth.role.view") {
+		r.WriteResponse(constant.ERROR_UNAUTHORIZED)
+		return
+	}
 	var perms []user.Permission
 	err := db.Find(&perms).Error
-	r := io.Upgrade(ctx)
 	if err != nil {
 		r.WriteResponse(e.Context(err))
 	} else {

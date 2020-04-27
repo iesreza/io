@@ -17,7 +17,6 @@ var Database *gorm.DB
 func SetupDatabase() {
 	Events.Go("database.starts")
 	config := config.Database
-	log.Debug(config)
 	var err error
 	if config.Enabled == false {
 		return
@@ -35,7 +34,7 @@ func SetupDatabase() {
 	default:
 		Database, err = gorm.Open("sqlite3", config.Database+config.Params)
 	}
-	Database.LogMode(true)
+	Database.LogMode(config.Debug == "true")
 	if err != nil {
 		log.Critical(err)
 	}
@@ -50,15 +49,12 @@ func GetDBO() *gorm.DB {
 	return Database
 }
 
-
 type Model struct {
 	ID        uint       `json:"id" gorm:"primary_key"`
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt time.Time  `json:"updated_at"`
 	DeletedAt *time.Time `json:"deleted_at" sql:"index"`
 }
-
-
 
 /*type Map map[string]interface{}
 
@@ -98,5 +94,3 @@ func (j Map) IsNull() bool {
 	return lib.IsNil(j)
 }
 */
-
-

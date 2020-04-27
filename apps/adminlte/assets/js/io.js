@@ -9,7 +9,7 @@ IO.Init = function(){
     $.ajaxSetup({
         headers: { 'X-Request-Type': 'application/io' , "Accept":"application/json"}
     });
-}
+}()
 
 IO.defaultAjaxAttributes = {dataType:"JSON", data:[], type:"POST", error:function (error) { if(IO.onAjaxError != undefined) IO.onAjaxError(error);}}
 IO.Ajax = function(params){
@@ -46,6 +46,9 @@ IO.Cookie = function (key,set,attributes) {
 
       return key ? jar[key] : jar
   }else{
+
+      console.warn(typeof set)
+
       attributes = IO.Assign({}, IO.defaultCookieAttributes, attributes)
       if (typeof attributes.expires === 'number') {
           attributes.expires = new Date(Date.now() + attributes.expires * 864e5)
@@ -364,6 +367,11 @@ String.prototype.toTitleCase = function () {
     });
 }
 
+String.prototype.trimChars = function (c) {
+    var re = new RegExp("^[" + c + "]+|[" + c + "]+$", "g");
+    return this.replace(re,"");
+}
+
 /**
  * Convert text to under score case
  */
@@ -542,4 +550,78 @@ Object.prototype.has = function(key){
     return JSON.stringify(this)
 }*/
 
-IO.Init()
+var _require_loaded = {}
+const require = function (...args) {
+    var callback = false;
+    var url = [];
+    var async = false;
+    var done = 0;
+    for(var i = 0; i < args.length; i++){
+        if(Array.isArray(args[i])){
+            for(j = 0; j < args[i].length;j++){
+                if(typeof args[i][j] === "string" && !_require_loaded.hasOwnProperty(args[i][j])){
+                    url.push(args[i][j]);
+                }
+            }
+            continue
+        }
+        if(typeof args[i] === "string" && !_require_loaded.hasOwnProperty(args[i]) ){
+                url.push(args[i]);
+        }
+        if(typeof args[i] === "function"){
+            callback = args[i];
+            async = true;
+        }
+    }
+    if(url.length == 0 && async == true){
+        callback();
+    }
+    for(var i = 0; i < url.length; i++){
+
+        parts = url[i].split("/")
+        file = parts[parts.length - 1]
+        parts = file.split(".")
+        ext = parts[parts.length - 1]
+        if(ext == "css") {
+            var el = jQuery("<link>", {rel: "stylesheet", type: "text/css", href: url[i]})[0];
+            el.onload = function () {
+                if (async) {
+                    done++
+                    if (done == url.length) {
+                        callback()
+                    }
+                }
+            }
+            document.getElementsByTagName("head")[0].appendChild(el);
+        }
+
+        if(ext == "js") {
+            jQuery.ajax({
+                url: url[i],
+                method: "GET",
+                dataType: "script",
+                async: async,
+                cache: true,
+                success: function () {
+                    if (async) {
+                        done++
+                        if (done == url.length) {
+                            callback()
+                        }
+                    }
+                },
+                error: function () {
+                    console.error("could not load %s", url[i])
+                    if (async) {
+                        done++
+                        if (done == url.length) {
+                            callback()
+                        }
+                    }
+                }
+            });
+        }
+
+    }
+
+};

@@ -40,7 +40,7 @@ database:
   pass: "super-pedro-1980"
   cache: true
   cache-size: 1000
-  debug: true
+  debug: false
   ssl-mode: "disable"
   max-open-connections: 100
   max-idle-connections: 10

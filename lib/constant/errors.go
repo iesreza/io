@@ -9,4 +9,5 @@ var (
 	ERROR_FORM_PARSE       = errors.New("unable to parse form")
 	ERROR_INVALID_ID       = errors.New("invalid id")
 	ERROR_OBJECT_NOT_EXIST = errors.New("object does not exist")
+	ERROR_UNAUTHORIZED     = errors.New("unauthorized access")
 )

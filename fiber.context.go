@@ -4,31 +4,34 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber"
 	"github.com/iesreza/io/lib/log"
+	"github.com/iesreza/io/lib/text"
 	"mime/multipart"
+	"reflect"
+	"time"
 )
 
 func (r *Request) Accepts(offers ...string) (offer string) {
-	return r.Context.Accepts(offers ...)
+	return r.Context.Accepts(offers...)
 }
 
 func (r *Request) AcceptsCharsets(offers ...string) (offer string) {
-	return r.Context.AcceptsCharsets(offers ...)
+	return r.Context.AcceptsCharsets(offers...)
 }
 
 func (r *Request) AcceptsEncodings(offers ...string) (offer string) {
-	return r.Context.AcceptsEncodings(offers ...)
+	return r.Context.AcceptsEncodings(offers...)
 }
 
 func (r *Request) AcceptsLanguages(offers ...string) (offer string) {
-	return r.Context.AcceptsLanguages(offers ...)
+	return r.Context.AcceptsLanguages(offers...)
 }
 
 func (r *Request) Append(field string, values ...string) {
-	r.Context.Append(field, values ...)
+	r.Context.Append(field, values...)
 }
 
 func (r *Request) Attachment(name ...string) {
-	r.Context.Attachment(name ...)
+	r.Context.Attachment(name...)
 }
 
 func (r *Request) BaseURL() string {
@@ -36,7 +39,7 @@ func (r *Request) BaseURL() string {
 }
 
 func (r *Request) Body(key ...string) string {
-	return r.Context.Body(key ...)
+	return r.Context.Body(key...)
 }
 
 func (r *Request) BodyParser(out interface{}) error {
@@ -44,7 +47,7 @@ func (r *Request) BodyParser(out interface{}) error {
 }
 
 func (r *Request) ClearCookie(key ...string) {
-	r.Context.ClearCookie(key ...)
+	r.Context.ClearCookie(key...)
 }
 
 func (r *Request) Cookie(cookie *fiber.Cookie) {
@@ -52,11 +55,11 @@ func (r *Request) Cookie(cookie *fiber.Cookie) {
 }
 
 func (r *Request) Cookies(key ...string) (value string) {
-	return r.Context.Cookies(key ...)
+	return r.Context.Cookies(key...)
 }
 
 func (r *Request) Download(file string, name ...string) {
-	r.Context.Download(file, name ...)
+	r.Context.Download(file, name...)
 }
 
 func (r *Request) Error() error {
@@ -125,15 +128,15 @@ func (r *Request) JSON(json interface{}) error {
 }
 
 func (r *Request) JSONP(json interface{}, callback ...string) error {
-	return r.Context.JSONP(json, callback ...)
+	return r.Context.JSONP(json, callback...)
 }
 
 func (r *Request) Links(link ...string) {
-	r.Context.Links(link ...)
+	r.Context.Links(link...)
 }
 
 func (r *Request) Locals(key string, value ...interface{}) (val interface{}) {
-	return r.Context.Locals(key, value ...)
+	return r.Context.Locals(key, value...)
 }
 
 func (r *Request) Location(path string) {
@@ -141,7 +144,7 @@ func (r *Request) Location(path string) {
 }
 
 func (r *Request) Method(override ...string) string {
-	return r.Context.Method(override ...)
+	return r.Context.Method(override...)
 }
 
 func (r *Request) MultipartForm() (*multipart.Form, error) {
@@ -149,7 +152,7 @@ func (r *Request) MultipartForm() (*multipart.Form, error) {
 }
 
 func (r *Request) Next(err ...error) {
-	r.Context.Next(err ...)
+	r.Context.Next(err...)
 }
 
 func (r *Request) OriginalURL() string {
@@ -161,7 +164,7 @@ func (r *Request) Params(key string) (value string) {
 }
 
 func (r *Request) Path(override ...string) string {
-	return r.Context.Path(override ...)
+	return r.Context.Path(override...)
 }
 
 func (r *Request) Protocol() string {
@@ -177,7 +180,7 @@ func (r *Request) Range(size int) (rangeData fiber.Range, err error) {
 }
 
 func (r *Request) Redirect(path string, status ...int) {
-	r.Context.Redirect(path, status ...)
+	r.Context.Redirect(path, status...)
 }
 
 func (r *Request) Render(file string, bind interface{}) error {
@@ -198,11 +201,11 @@ func (r *Request) Secure() bool {
 
 func (r *Request) SendHTML(bodies ...interface{}) {
 	r.Set("Content-Type", "text/html")
-	r.Context.Send(bodies ...)
+	r.Context.Send(bodies...)
 }
 
 func (r *Request) Send(bodies ...interface{}) {
-	r.Context.Send(bodies ...)
+	r.Context.Send(bodies...)
 }
 
 func (r *Request) SendBytes(body []byte) {
@@ -210,7 +213,7 @@ func (r *Request) SendBytes(body []byte) {
 }
 
 func (r *Request) SendFile(file string, noCompression ...bool) {
-	r.Context.SendFile(file, noCompression ...)
+	r.Context.SendFile(file, noCompression...)
 }
 
 func (r *Request) SendStatus(status int) {
@@ -226,7 +229,7 @@ func (r *Request) Set(key string, val string) {
 }
 
 func (r *Request) Subdomains(offset ...int) []string {
-	return r.Context.Subdomains(offset ...)
+	return r.Context.Subdomains(offset...)
 }
 
 func (r *Request) Stale() bool {
@@ -244,7 +247,7 @@ func (r *Request) Type(ext string) *Request {
 }
 
 func (r *Request) Vary(fields ...string) {
-	r.Context.Vary(fields ...)
+	r.Context.Vary(fields...)
 }
 
 func (r *Request) Write(bodies ...interface{}) {
@@ -253,4 +256,33 @@ func (r *Request) Write(bodies ...interface{}) {
 
 func (r *Request) XHR() bool {
 	return r.Context.XHR()
+}
+func (r *Request) SetCookie(key string, val interface{}, params ...interface{}) {
+	cookie := new(fiber.Cookie)
+	cookie.Name = key
+
+	ref := reflect.ValueOf(val)
+	switch ref.Kind() {
+	case reflect.String:
+		cookie.Value = val.(string)
+		break
+	case reflect.Ptr:
+		r.SetCookie(key, ref.Elem().Interface(), params...)
+		return
+	case reflect.Map, reflect.Struct, reflect.Array, reflect.Slice:
+		cookie.Value = text.ToJSON(val)
+		break
+	default:
+		cookie.Value = fmt.Sprint(val)
+	}
+
+	for _, item := range params {
+		if v, ok := item.(time.Duration); ok {
+			cookie.Expires = time.Now().Add(v)
+		}
+		if v, ok := item.(time.Time); ok {
+			cookie.Expires = v
+		}
+	}
+	r.Cookie(cookie)
 }

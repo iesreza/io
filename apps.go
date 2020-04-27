@@ -2,18 +2,23 @@ package io
 
 import (
 	"github.com/iesreza/io/lib/ref"
+	"github.com/iesreza/io/menu"
 	"github.com/iesreza/io/user"
 )
 
 type App interface {
 	Register()
 	Router()
+	WhenReady()
 	Permissions() []user.Permission
+	Menus() []menu.Menu
 }
 
+var onReady = []func(){}
 var apps = map[string]interface{}{}
+var AppMenus = []menu.Menu{}
 
-func Register(app App)  {
+func Register(app App) {
 	name := ref.Parse(app).Package
 
 	//app already exist
@@ -26,9 +31,12 @@ func Register(app App)  {
 	app.Router()
 	permissions := user.Permissions(app.Permissions())
 	permissions.Sync(name)
+	n := app.Menus()
+	AppMenus = append(AppMenus, n...)
 
+	onReady = append(onReady, app.WhenReady)
 }
 
-func GetRegisteredApps() map[string]interface{}  {
+func GetRegisteredApps() map[string]interface{} {
 	return apps
 }

@@ -135,6 +135,11 @@ func Run() {
 		}
 		c.SendStatus(404)
 	})
+	Events.Go("init.after")
+
+	for _, item := range onReady {
+		item()
+	}
 
 	var err error
 	if config.Server.HTTPS {
