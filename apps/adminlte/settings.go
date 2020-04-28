@@ -1,6 +1,8 @@
 package adminlte
 
 import (
+	"fmt"
+	"github.com/iesreza/io"
 	"reflect"
 	"sync"
 )
@@ -19,4 +21,9 @@ func (settings Settings) Get(key string) interface{} {
 	defer settings.mu.Unlock()
 	ref := reflect.ValueOf(settings)
 	return ref.FieldByName(key).Interface()
+}
+
+func (s *Settings) OnUpdate(r *io.Request) bool {
+	fmt.Println("on update called")
+	return true
 }

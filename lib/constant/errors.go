@@ -10,4 +10,5 @@ var (
 	ERROR_INVALID_ID       = errors.New("invalid id")
 	ERROR_OBJECT_NOT_EXIST = errors.New("object does not exist")
 	ERROR_UNAUTHORIZED     = errors.New("unauthorized access")
+	ERROR_MUST_LOGIN       = errors.New("you must login first")
 )

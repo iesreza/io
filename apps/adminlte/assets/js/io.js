@@ -88,7 +88,7 @@ IO.RemoveCookie = function(key){
     if (typeof document === 'undefined' || (arguments.length && !key)) {
         return
     }
-    IO.Cookie(key,"",{expires:-1})
+    IO.Cookie(key,"",{expires:-100000000 , path: "/"})
 }
 
 /**

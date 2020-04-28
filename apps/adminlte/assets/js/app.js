@@ -75,9 +75,13 @@ App.Init = function () {
 
 App.Error = function (res) {
     if(res.success){
-        return true
+        return false
     }
     console.error(res)
+    return true
 };
 
 
+App.Flash = function () {
+    IO.RemoveCookie("flash")
+}()

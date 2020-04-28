@@ -260,7 +260,7 @@ func (r *Request) XHR() bool {
 func (r *Request) SetCookie(key string, val interface{}, params ...interface{}) {
 	cookie := new(fiber.Cookie)
 	cookie.Name = key
-
+	cookie.Path = "/"
 	ref := reflect.ValueOf(val)
 	switch ref.Kind() {
 	case reflect.String:

@@ -26,8 +26,8 @@ type Request struct {
 	flashes   []flash
 }
 type flash struct {
-	Type    string
-	Message string
+	Type    string `json:"type"`
+	Message string `json:"message"`
 }
 type Response struct {
 	Success bool        `json:"success"`
@@ -260,4 +260,14 @@ func (r *Request) HasError() bool {
 
 func (r *Request) Var(key string, value interface{}) {
 	r.Variables[key] = value
+}
+
+func (r Request) GetFlashes() []flash {
+	var resp []flash
+	flash := r.Cookies("flash")
+	if flash != "" {
+		json.Unmarshal([]byte(flash), &resp)
+	}
+
+	return resp
 }

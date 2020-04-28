@@ -2,8 +2,6 @@
 <html>
 <head>
 	{{include "imports/head.jet"}}
-
-
 </head>
 <body class="hold-transition accent-{{ settings.Get("AccentColor") }} sidebar-mini">
 <!-- Site wrapper -->
@@ -185,6 +183,7 @@
     </section>
   {{ end }}
     <section class="content">
+        {{include "imports/flash.jet"}}
         {{ if isset(body)  }}
         {{ raw:body }}
         {{ end }}

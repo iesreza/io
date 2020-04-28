@@ -6,7 +6,10 @@ import (
 	"github.com/iesreza/io"
 	"github.com/iesreza/io/errors"
 	"github.com/iesreza/io/html"
+	"github.com/iesreza/io/i18"
 	"github.com/iesreza/io/lib"
+	"github.com/iesreza/io/lib/constant"
+	"github.com/iesreza/io/lib/ref"
 	"github.com/iesreza/io/lib/text"
 	"reflect"
 	"strings"
@@ -42,6 +45,16 @@ func (c Controller) set(s string, object interface{}) {
 
 func (c Controller) view(ctx *fiber.Ctx) {
 	r := io.Upgrade(ctx)
+	if r.User.Anonymous {
+		r.Flash("warning", constant.ERROR_UNAUTHORIZED.Error())
+		r.Redirect("/admin/error")
+		return
+	}
+	if !r.User.HasPerm("settings.access") {
+		r.Flash("error", constant.ERROR_MUST_LOGIN.Error())
+		r.Redirect("/admin/login")
+		return
+	}
 	r.Var("heading", "Settings")
 
 	var registries []Registry
@@ -56,10 +69,6 @@ func (c Controller) view(ctx *fiber.Ctx) {
 	r.View(map[string]interface{}{
 		"registries": registries,
 	}, "settings.settings", "template.default")
-
-	/*	r.View(map[string]interface{}{
-		"elements": []html.InputStruct{*s1,*s2,*s3,*s4,*D1,*D5,*D2,*D3,*D4,*elem8,*elem9,*elem10,*elem1,*elem2,*elem3},
-	},"registry.settings","template.default")*/
 }
 
 func (c Controller) getForm(v interface{}) []html.InputStruct {
@@ -104,17 +113,22 @@ func (c Controller) getForm(v interface{}) []html.InputStruct {
 			}
 			input.SetOptions(options)
 		}
+		input.Value = ref.Field(i).Interface()
 		frm = append(frm, *input)
 	}
 	return frm
 }
 
 func (c Controller) save(ctx *fiber.Ctx) {
-	r := io.Upgrade(ctx)
 
+	r := io.Upgrade(ctx)
+	if !r.User.HasPerm("settings.access") {
+		r.WriteResponse(false, e.Context(constant.ERROR_UNAUTHORIZED))
+		return
+	}
 	name := r.Params("name")
 	if !settings.Has(name) {
-		r.WriteResponse(false, e.Context("settings not found"))
+		r.WriteResponse(false, e.Context(constant.ERROR_OBJECT_NOT_EXIST))
 		return
 	}
 	item := settings.Get(name).(Settings)
@@ -124,20 +138,25 @@ func (c Controller) save(ctx *fiber.Ctx) {
 		r.WriteResponse(false, err)
 		return
 	}
+	ref.Invoke(item.Ptr, "OnUpdate", r)
 	b, err := json.Marshal(item.Ptr)
 	item.Data = string(b)
 
 	db.Debug().Model(&item).Where("reference = ?", item.Reference).Update("data", item.Data)
 	settings.Set(name, item)
+	r.Flash("success", i18.T("Successfully saved"))
 	r.WriteResponse(true, item)
 }
 
 func (c Controller) reset(ctx *fiber.Ctx) {
 	r := io.Upgrade(ctx)
-
+	if !r.User.HasPerm("settings.access") {
+		r.WriteResponse(false, e.Context(constant.ERROR_UNAUTHORIZED))
+		return
+	}
 	name := r.Params("name")
 	if !settings.Has(name) {
-		r.WriteResponse(false, e.Context("settings not found"))
+		r.WriteResponse(false, e.Context(constant.ERROR_OBJECT_NOT_EXIST))
 		return
 	}
 	item := settings.Get(name).(Settings)
@@ -149,6 +168,7 @@ func (c Controller) reset(ctx *fiber.Ctx) {
 		r.WriteResponse(false, err)
 		return
 	}
+	ref.Invoke(item.Ptr, "OnUpdate", r)
 	db.Debug().Model(&item).Where("reference = ?", item.Reference).Update("data", item.Data)
 	settings.Set(name, item)
 	r.WriteResponse(true, item)
