@@ -16,6 +16,7 @@ var config struct {
 	}
 }
 
+// Save save user instance
 func (u *User) Save() error {
 	if u.Group == nil && u.GroupID > 0 {
 		gp := Group{}
@@ -55,6 +56,7 @@ func (u *User) Save() error {
 	}
 }
 
+// AfterFind after find event
 func (u *User) AfterFind() (err error) {
 	gp := Group{}
 	if !db.Where("id = ?", u.GroupID).Find(&gp).RecordNotFound() {
@@ -67,6 +69,7 @@ func (u *User) AfterFind() (err error) {
 	return
 }
 
+// SetPassword set user password
 func (u *User) SetPassword(password string) error {
 	pass, err := passlib.Hash(password)
 	if err != nil {
@@ -76,6 +79,7 @@ func (u *User) SetPassword(password string) error {
 	return nil
 }
 
+// HasRole check if user has role
 func (u *User) HasRole(v interface{}) bool {
 	if u.Admin {
 		return true
@@ -99,6 +103,7 @@ func (u *User) HasRole(v interface{}) bool {
 	return false
 }
 
+// HasPerm check if user has permission
 func (u *User) HasPerm(v string) bool {
 	if u.Admin {
 		return true
@@ -109,10 +114,12 @@ func (u *User) HasPerm(v string) bool {
 	return u.Group.HasPerm(v)
 }
 
+// Image return user image
 func (u User) Image() string {
 	return "files/profile/profile-" + fmt.Sprint(u.ID) + ".jpg"
 }
 
+// SetGroup set user group
 func (u *User) SetGroup(group interface{}) error {
 	var gp Group
 	if val, ok := group.(Group); ok {
@@ -126,6 +133,7 @@ func (u *User) SetGroup(group interface{}) error {
 	return db.Save(u).Error
 }
 
+// Sync synchronize permissions on startup
 func (perms Permissions) Sync(app string) {
 	var ids []uint
 	for _, perm := range perms {

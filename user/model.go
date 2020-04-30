@@ -66,14 +66,17 @@ type User struct {
 	Params    data.Map  `gorm:"type:json" form:"params" json:"params"`
 }
 
+// TableName return role model table name
 func (Role) TableName() string {
 	return "role"
 }
 
+// TableName return group model table name
 func (Group) TableName() string {
 	return "group"
 }
 
+// InitUserModel initialize the user model with given config
 func InitUserModel(database *gorm.DB, config interface{}) {
 	j := text.ToJSON(config)
 	json.Unmarshal([]byte(j), &config)

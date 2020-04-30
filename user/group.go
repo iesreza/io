@@ -5,6 +5,7 @@ import (
 	"github.com/iesreza/validate"
 )
 
+// Save save the group instance
 func (g *Group) Save() error {
 	var set []*Role
 	var remove []*Role
@@ -55,6 +56,7 @@ func (g *Group) Save() error {
 	}
 }
 
+// HasPerm check the group if has permission
 func (g *Group) HasPerm(v string) bool {
 	for _, role := range g.Roles {
 		if role.HasPerm(v) {
@@ -64,6 +66,7 @@ func (g *Group) HasPerm(v string) bool {
 	return false
 }
 
+// AfterFind after find event
 func (g *Group) AfterFind() (err error) {
 	var roles []*Role
 	db.Model(g).Related(&roles, "Roles")
