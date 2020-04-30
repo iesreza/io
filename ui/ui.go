@@ -1,4 +1,4 @@
 package ui
 
-type Page    struct {}
-type Element struct {}
+type Page struct{}
+type Element struct{}
