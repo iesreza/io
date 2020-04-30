@@ -33,7 +33,6 @@ func (App) Register() {
 			"created_at": `validate:"format=date"`,
 		},
 	}
-	userFilter.SetFilter("id != ?", 4)
 	query.Register(userFilter)
 
 	db = io.GetDBO()

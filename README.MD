@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/iesreza/io)](https://goreportcard.com/report/github.com/iesreza/io)
+
 ## IO Web Application Development Framework
 IO is a powerful package for quickly writing modular web applications/services in Golang aimed both backend and frontend.
 
