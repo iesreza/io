@@ -1,5 +1,6 @@
 package menu
 
+// Menu general menu struct
 type Menu struct {
 	Title      string `json:"title"`
 	Url        string `json:"url"`

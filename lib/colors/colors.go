@@ -10,6 +10,7 @@ var (
 	ErrBadColor = errors.New("Parsing of color failed, Bad Color")
 )
 
+// NamedColor hex value of named colors
 type NamedColor struct {
 	Hex string
 }
@@ -186,11 +187,13 @@ func Parse(s string) (Color, error) {
 	return nil, ErrBadColor
 }
 
+// Color return Color instance of named colors
 func (c NamedColor) Color() Color {
 	color, _ := ParseHEX(c.Hex)
 	return color
 }
 
+// String return hex value of named colors
 func (c NamedColor) String() string {
 	return c.Hex
 }

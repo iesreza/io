@@ -19,6 +19,7 @@ type file struct {
 	tests      string
 }
 
+// Open opens a file to proccess
 func Open(path string) (*file, error) {
 	f := file{timeout: DefaultTimeout, path: path}
 	var err error
@@ -37,6 +38,7 @@ func Open(path string) (*file, error) {
 	return &f, nil
 }
 
+// SetLastAccess sets last access time of a file
 func (f *file) SetLastAccess() {
 	f.lastaccess = time.Now().UnixNano()
 }
@@ -60,10 +62,12 @@ func (f *file) access(mode int) error {
 	return nil
 }
 
+// WriteString writes string to file
 func (f *file) WriteString(v string) error {
 	return f.Write([]byte(v))
 }
 
+// WriteJson take struct and write to file as json
 func (f *file) WriteJson(v interface{}, pretty bool) error {
 	if pretty {
 		b, err := json.MarshalIndent(v, "", "    ")
@@ -81,6 +85,7 @@ func (f *file) WriteJson(v interface{}, pretty bool) error {
 	return f.Write(b)
 }
 
+// Write writes bytes to file
 func (f *file) Write(v []byte) error {
 	if err := f.access(os.O_RDWR); err != nil {
 		return err
@@ -90,6 +95,7 @@ func (f *file) Write(v []byte) error {
 	return err
 }
 
+// Append appends bytes to file
 func (f *file) Append(v []byte) error {
 	if err := f.access(os.O_APPEND | os.O_WRONLY); err != nil {
 		return err
@@ -98,10 +104,12 @@ func (f *file) Append(v []byte) error {
 	return err
 }
 
+// AppendString appends string to file
 func (f *file) AppendString(v string) error {
 	return f.Append([]byte(v))
 }
 
+// ReadAll read file to bytes
 func (f *file) ReadAll() ([]byte, error) {
 	if err := f.access(os.O_RDWR); err != nil {
 		return []byte{}, err
@@ -119,12 +127,14 @@ func (f *file) ReadAll() ([]byte, error) {
 	return buffer, err
 }
 
+// ReadAllString read file to string
 func (f *file) ReadAllString() (string, error) {
 	b, err := f.ReadAll()
 	return string(b), err
 }
 
-func (f *file) UnmarshalJSON(v interface{}) error {
+// UnmarshalJson read file and parse as json
+func (f *file) UnmarshalJson(v interface{}) error {
 	b, err := f.ReadAll()
 	if err != nil {
 		return err
@@ -132,6 +142,7 @@ func (f *file) UnmarshalJSON(v interface{}) error {
 	return json.Unmarshal(b, v)
 }
 
+// Truncate empty the file
 func (f *file) Truncate() error {
 	if err := f.access(os.O_RDWR); err != nil {
 		return err
@@ -144,10 +155,12 @@ func (f *file) Truncate() error {
 	return err
 }
 
+// SetTimeout closes the file if not being modified after duration
 func (f *file) SetTimeout(d time.Duration) {
 	f.timeout = d
 }
 
+// Close releases file resources
 func (f *file) Close() {
 	f.fp.Close()
 	f.closed = true

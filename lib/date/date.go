@@ -9,21 +9,25 @@ import (
 	"time"
 )
 
+// Date generic date struc
 type Date struct {
 	Base time.Time
 }
 
+// Now return current date
 func Now() *Date {
 	return &Date{
 		Base: time.Now(),
 	}
 }
 
+// Midnight return midnight of given date
 func (d *Date) Midnight() *Date {
 	d.Base = time.Date(d.Base.Year(), d.Base.Month(), d.Base.Day(), 0, 0, 0, 0, d.Base.Location())
 	return d
 }
 
+// Calculate calculates relative date to given date
 func (d *Date) Calculate(expr string) (*Date, error) {
 	expr = strings.ToLower(expr)
 	fields := strings.Fields(expr)
@@ -117,14 +121,17 @@ func (d *Date) Calculate(expr string) (*Date, error) {
 
 }
 
+// DiffUnix add int64 to given date then return timestamp
 func (d *Date) DiffUnix(t int64) time.Duration {
 	return time.Duration(d.Base.Unix()-t) * time.Second
 }
 
+// DiffDate add date to given date return timestamp
 func (d *Date) DiffDate(t Date) time.Duration {
 	return time.Duration(d.Base.Unix()-t.Unix()) * time.Second
 }
 
+// DiffExpr add expr to date return timestamp
 func (d *Date) DiffExpr(expr string) (time.Duration, error) {
 	t := time.Date(d.Base.Year(), d.Base.Month(), d.Base.Day(), d.Base.Hour(), d.Base.Minute(), d.Base.Second(), d.Base.Nanosecond(), d.Base.Location())
 	_, err := d.Calculate(expr)
@@ -134,26 +141,32 @@ func (d *Date) DiffExpr(expr string) (time.Duration, error) {
 	return d.DiffTime(t), nil
 }
 
+// DiffTime add given time date return timestamp
 func (d *Date) DiffTime(t time.Time) time.Duration {
 	return time.Duration(d.Base.Unix()-t.Unix()) * time.Second
 }
 
+// Format formats given date
 func (d *Date) Format(expr string) string {
 	return d.Base.Format(expr)
 }
 
+// FormatS format given date as strftime syntax
 func (d *Date) FormatS(expr string) string {
 	return strftime.Format(&d.Base, expr)
 }
 
+// Unix return timestamp of given date
 func (d *Date) Unix() int64 {
 	return d.Base.Unix()
 }
 
+// UnixNano return nano timestamp of given date
 func (d *Date) UnixNano() int64 {
 	return d.Base.UnixNano()
 }
 
+// FromString parse any string to Date
 func FromString(expr string) (*Date, error) {
 	t, err := dateparse.ParseLocal(expr)
 	if err != nil {
@@ -164,12 +177,14 @@ func FromString(expr string) (*Date, error) {
 	}, nil
 }
 
+// FromTime parse time to Date
 func FromTime(t time.Time) *Date {
 	return &Date{
 		Base: t,
 	}
 }
 
+// FomUnix parse timestamp to Date
 func FromUnix(sec int64) *Date {
 	t := time.Unix(sec, 0)
 	return &Date{

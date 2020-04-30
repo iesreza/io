@@ -6,16 +6,18 @@ import (
 	"fmt"
 )
 
+// TODO: Merge with concurrent map
 
-
-
+// Map gorm compatible dynamic map
 type Map map[string]interface{}
 
+// Value return json value to store by gorm
 func (p Map) Value() (driver.Value, error) {
 	j, err := json.Marshal(p)
 	return j, err
 }
 
+// Scan parse json from gorm to map
 func (p *Map) Scan(src interface{}) error {
 	source, ok := src.([]byte)
 	if !ok {

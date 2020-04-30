@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// Model common model stuff
 type Model struct {
 	ID        uint       `json:"id" gorm:"primary_key"`
 	CreatedAt time.Time  `json:"created_at"`
@@ -15,6 +16,7 @@ type Model struct {
 	DeletedAt *time.Time `json:"deleted_at" sql:"index"`
 }
 
+// Role role struct
 type Role struct {
 	Model
 	Name          string       `json:"name" form:"name" validate:"empty=false & format=strict_html"`
@@ -25,6 +27,7 @@ type Role struct {
 	PermissionSet []string     `json:"permissions" form:"permissions" gorm:"-"`
 }
 
+// Group group struct
 type Group struct {
 	Model
 	Name     string   `json:"name" form:"name" validate:"empty=false & format=strict_html"`
@@ -34,6 +37,7 @@ type Group struct {
 	RoleSet  []string `json:"roles" form:"roles" gorm:"-"`
 }
 
+// Permission permission struct
 type Permission struct {
 	Model
 	CodeName    string `json:"code_name" form:"code_name" validate:"empty=false"`
@@ -42,14 +46,17 @@ type Permission struct {
 	App         string `json:"app" form:"app" validate:"empty=false"`
 }
 
+// Permissions slice of permissions
 type Permissions []Permission
 
+// RolePermission role to permission orm
 type RolePermission struct {
 	Model
 	RoleID       uint
 	PermissionID uint
 }
 
+// User user struct
 type User struct {
 	Model
 	Name      string    `json:"name" form:"name"`
