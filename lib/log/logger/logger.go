@@ -440,7 +440,7 @@ func (l *Logger) Debugf(format string, a ...interface{}) {
 	l.log_internal(DebugLevel, fmt.Sprintf(format, a...), 2)
 }
 
-// Prints this goroutine's execution stack as an error with an optional message at the begining
+// Prints this goroutine's execution stack as an error with an optional message at the beginning
 func (l *Logger) StackAsError(message string) {
 	if message == "" {
 		message = "Stack info"
@@ -449,7 +449,7 @@ func (l *Logger) StackAsError(message string) {
 	l.log_internal(ErrorLevel, message+Stack(), 2)
 }
 
-// Prints this goroutine's execution stack as critical with an optional message at the begining
+// Prints this goroutine's execution stack as critical with an optional message at the beginning
 func (l *Logger) StackAsCritical(message string) {
 	if message == "" {
 		message = "Stack info"

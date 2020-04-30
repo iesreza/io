@@ -325,7 +325,7 @@ func Read(lines int, level Level) {
 		line := ""
 		for {
 			cursor -= 1
-			if cursor <= -filesize { // stop if we are at the begining
+			if cursor <= -filesize { // stop if we are at the beginning
 				breakLines = true
 				break
 			}
@@ -340,7 +340,7 @@ func Read(lines int, level Level) {
 
 			line = fmt.Sprintf("%s%s", string(char), line) // there is more efficient way
 
-			if cursor <= -filesize { // stop if we are at the begining
+			if cursor <= -filesize { // stop if we are at the beginning
 				breakLines = true
 				break
 			}

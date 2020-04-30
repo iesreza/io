@@ -160,8 +160,8 @@ func (s *SFTP) Exist(path string) bool {
 
 func (s *SFTP) Upload(local, remote string, overwrite UploadAction) (int64, error) {
 	remote_tmp := remote + "_tmp"
-	_, err := s.Stat(remote)
-	fmt.Println(local, " => ", remote)
+	var err error
+	_, err = s.Stat(remote)
 	if overwrite == UPLOAD_DONT_OVERWRITE && err != nil {
 		return 0, fmt.Errorf("remote file exist")
 	}
@@ -172,7 +172,8 @@ func (s *SFTP) Upload(local, remote string, overwrite UploadAction) (int64, erro
 			return 0, err
 		}
 	}
-	dstFile, err := s.Client.Create(remote_tmp)
+	var dstFile *sftp.File
+	dstFile, err = s.Client.Create(remote_tmp)
 	if err != nil {
 		return 0, err
 	}
@@ -184,7 +185,8 @@ func (s *SFTP) Upload(local, remote string, overwrite UploadAction) (int64, erro
 	}
 	defer srcFile.Close()
 	// copy source file to destination file
-	bytes, err := io.Copy(dstFile, srcFile)
+	var bytes int64
+	bytes, err = io.Copy(dstFile, srcFile)
 	if err != nil {
 		return bytes, err
 	}

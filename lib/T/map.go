@@ -1,8 +1,8 @@
 package T
 
 import (
-"encoding/json"
-"sync"
+	"encoding/json"
+	"sync"
 )
 
 var SHARD_COUNT = 32
@@ -166,7 +166,7 @@ type Tuple struct {
 
 // Iter returns an iterator which could be used in a for range loop.
 //
-// Deprecated: using IterBuffered() will get a better performence
+// Deprecated: using IterBuffered() will get a better performance`
 func (m ConcurrentMap) Iter() <-chan Tuple {
 	chans := snapshot(m)
 	ch := make(chan Tuple)
