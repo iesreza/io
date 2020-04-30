@@ -14,7 +14,7 @@ import (
 
 var Database *gorm.DB
 
-func SetupDatabase() {
+func setupDatabase() {
 	Events.Go("database.starts")
 	config := config.Database
 	var err error
@@ -42,9 +42,10 @@ func SetupDatabase() {
 
 }
 
+// GetDBO return database object instance
 func GetDBO() *gorm.DB {
 	if Database == nil {
-		SetupDatabase()
+		setupDatabase()
 	}
 	return Database
 }
@@ -55,42 +56,3 @@ type Model struct {
 	UpdatedAt time.Time  `json:"updated_at"`
 	DeletedAt *time.Time `json:"deleted_at" sql:"index"`
 }
-
-/*type Map map[string]interface{}
-
-func (j Map) Value() (driver.Value, error) {
-	if j.IsNull() {
-		return nil, nil
-	}
-	return text.ToJSON(j), nil
-}
-
-func (j *Map) Scan(value interface{}) error {
-	if lib.IsNil(value) {
-		*j = nil
-		return nil
-	}
-	s, ok := value.([]byte)
-	if !ok {
-		fmt.Errorf("Invalid Scan Source")
-	}
-	err := json.Unmarshal(s,j)
-	if err != nil{
-		return err
-	}
-	return nil
-}
-
-func (m Map) MarshalJSON() ([]byte, error) {
-	fmt.Println(m)
-	return json.Marshal(m)
-}
-
-func (m *Map) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data,m)
-}
-
-func (j Map) IsNull() bool {
-	return lib.IsNil(j)
-}
-*/

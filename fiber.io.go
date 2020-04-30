@@ -2,7 +2,6 @@ package io
 
 import (
 	"github.com/gofiber/fiber"
-	"net/http"
 )
 
 // Group is used for Routes with common prefix to define a new sub-router with optional middleware.
@@ -36,6 +35,7 @@ func Connect(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	return app.Connect(path, handlers...)
 }
 
+// Put : https://fiber.wiki/application#http-methods
 func Put(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	if app == nil {
 		panic("Access object before call Setup()")
@@ -43,6 +43,7 @@ func Put(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	return app.Put(path, handlers...)
 }
 
+// Post : https://fiber.wiki/application#http-methods
 func Post(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	if app == nil {
 		panic("Access object before call Setup()")
@@ -50,6 +51,7 @@ func Post(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	return app.Post(path, handlers...)
 }
 
+// Delete : https://fiber.wiki/application#http-methods
 func Delete(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	if app == nil {
 		panic("Access object before call Setup()")
@@ -57,6 +59,7 @@ func Delete(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	return app.Delete(path, handlers...)
 }
 
+// Head : https://fiber.wiki/application#http-methods
 func Head(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	if app == nil {
 		panic("Access object before call Setup()")
@@ -64,6 +67,7 @@ func Head(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	return app.Head(path, handlers...)
 }
 
+// Patch : https://fiber.wiki/application#http-methods
 func Patch(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	if app == nil {
 		panic("Access object before call Setup()")
@@ -71,6 +75,7 @@ func Patch(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	return app.Patch(path, handlers...)
 }
 
+// Options : https://fiber.wiki/application#http-methods
 func Options(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	if app == nil {
 		panic("Access object before call Setup()")
@@ -78,6 +83,7 @@ func Options(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	return app.Options(path, handlers...)
 }
 
+// Trace : https://fiber.wiki/application#http-methods
 func Trace(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	if app == nil {
 		panic("Access object before call Setup()")
@@ -85,6 +91,7 @@ func Trace(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	return app.Trace(path, handlers...)
 }
 
+// Get : https://fiber.wiki/application#http-methods
 func Get(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	if app == nil {
 		panic("Access object before call Setup()")
@@ -92,6 +99,7 @@ func Get(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	return app.Get(path, handlers...)
 }
 
+// All : https://fiber.wiki/application#http-methods
 func All(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	if app == nil {
 		panic("Access object before call Setup()")
@@ -99,16 +107,16 @@ func All(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 	return app.All(path, handlers...)
 }
 
+// Shutdown gracefully shuts down the server without interrupting any active connections.
+// Shutdown works by first closing all open listeners and then waiting indefinitely for all connections to return to idle and then shut down.
+//
+// When Shutdown is called, Serve, ListenAndServe, and ListenAndServeTLS immediately return nil.
+// Make sure the program doesn't exit and waits instead for Shutdown to return.
+//
+// Shutdown does not close keepalive connections so its recommended to set ReadTimeout to something else than 0.
 func Shutdown() error {
 	if app == nil {
 		panic("Access object before call Setup()")
 	}
 	return app.Shutdown()
-}
-
-func Test(request *http.Request, msTimeout ...int) (*http.Response, error) {
-	if app == nil {
-		panic("Access object before call Setup()")
-	}
-	return app.Test(request, msTimeout...)
 }

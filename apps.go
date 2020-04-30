@@ -18,6 +18,7 @@ var onReady = []func(){}
 var apps = map[string]interface{}{}
 var AppMenus = []menu.Menu{}
 
+// Register register app to use by IO
 func Register(app App) {
 	name := ref.Parse(app).Package
 
@@ -37,6 +38,7 @@ func Register(app App) {
 	onReady = append(onReady, app.WhenReady)
 }
 
+// GetRegisteredApps return list of registered apps
 func GetRegisteredApps() map[string]interface{} {
 	return apps
 }

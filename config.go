@@ -197,6 +197,7 @@ func parseConfig() *Configuration {
 	return config
 }
 
+// Guess path find file path from different locations
 func GuessPath(file string) string {
 	wd, _ := os.Getwd()
 	if gpath.IsFileExist(wd + "/" + file) {
@@ -242,6 +243,7 @@ func run(command string) string {
 	return strings.TrimSpace(string(b))
 }
 
+// GetConfig return configuration instance
 func GetConfig() *Configuration {
 	return config
 }

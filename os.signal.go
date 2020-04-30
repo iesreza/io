@@ -26,7 +26,9 @@ var signals = [...]string{
 	15: "Terminated",
 }
 var exit = false
-func InterceptOSSignal()  {
+
+// InterceptOSSignal TODO:Remove
+func InterceptOSSignal() {
 	return
 
 	Events.On("app.signal", func(signal os.Signal) error {
@@ -34,7 +36,7 @@ func InterceptOSSignal()  {
 			if !exit {
 				exit = true
 				go func() {
-					time.Sleep(5*time.Second)
+					time.Sleep(5 * time.Second)
 					fmt.Println("User did not reply in time. go back to normal life ...")
 					exit = false
 				}()
@@ -44,7 +46,6 @@ func InterceptOSSignal()  {
 
 		return nil
 	})
-
 
 	signal_chan := make(chan os.Signal, 1)
 	signal.Notify(signal_chan,
@@ -61,15 +62,15 @@ func InterceptOSSignal()  {
 		syscall.SIGPIPE,
 		syscall.SIGALRM,
 		syscall.SIGTERM,
-		)
+	)
 	exit_chan := make(chan int)
 
 	go func() {
 		for {
 			s := <-signal_chan
 			fmt.Println(s.String())
-			err := Events.Go("app.signal",s)
-			if err != nil{
+			err := Events.Go("app.signal", s)
+			if err != nil {
 				fmt.Println(err)
 				continue
 			}
@@ -90,5 +91,3 @@ func InterceptOSSignal()  {
 	os.Exit(code)
 
 }
-
-

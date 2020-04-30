@@ -30,6 +30,7 @@ var (
 	statics [][2]string
 )
 
+// Setup setup the IO app
 func Setup() {
 	parseArgs()
 	fmt.Printf("Input args %+v \n", Arg)
@@ -108,6 +109,7 @@ func Setup() {
 
 }
 
+// CustomError set custom page for errors
 func CustomError(code int, path string) error {
 	if gpath.IsFileExist(path) {
 		StatusCodePages[code] = path
@@ -120,6 +122,7 @@ func CustomError(code int, path string) error {
 
 }
 
+// Run start IO Server
 func Run() {
 	go InterceptOSSignal()
 
@@ -155,6 +158,7 @@ func Run() {
 	panic(err)
 }
 
-func Getapp() *fiber.Fiber {
+// GetApp return fiber instance
+func GetApp() *fiber.Fiber {
 	return app
 }

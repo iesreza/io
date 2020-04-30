@@ -17,6 +17,7 @@ var Functions = map[string]jet.Func{
 
 var WorkingDir = gpath.WorkingDir()
 
+// Bind bind global useful functions to view
 func Bind(views *jet.Set, fn ...string) {
 
 	for _, item := range fn {
