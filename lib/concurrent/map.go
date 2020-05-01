@@ -64,7 +64,7 @@ func (m *Map) Keys() []string {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	var list []string
-	for k, _ := range m.data {
+	for k := range m.data {
 		list = append(list, k)
 	}
 	sort.Strings(list)

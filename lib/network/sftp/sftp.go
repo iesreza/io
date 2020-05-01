@@ -81,7 +81,7 @@ func (s *SFTP) Connect() error {
 
 func (s *SFTP) interactivePassword(user, instruction string, questions []string, echos []bool) (answers []string, err error) {
 	answers = make([]string, len(questions))
-	for n, _ := range questions {
+	for n := range questions {
 		answers[n] = s.Password
 	}
 	return answers, nil
