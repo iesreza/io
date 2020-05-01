@@ -7,17 +7,17 @@ type Map struct {
 	data map[string]Filter
 }
 
-func (m *Map)Init() {
+func (m *Map) Init() {
 	m.data = map[string]Filter{}
 }
 
-func (m *Map)Set(k string,v Filter)  {
+func (m *Map) Set(k string, v Filter) {
 	m.lock.Lock()
 	m.data[k] = v
 	m.lock.Unlock()
 }
 
-func (m *Map)Get(k string) *Filter {
+func (m *Map) Get(k string) *Filter {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	if v, ok := m.data[k]; ok {
@@ -26,7 +26,7 @@ func (m *Map)Get(k string) *Filter {
 	return nil
 }
 
-func (m *Map)Has(k string) bool {
+func (m *Map) Has(k string) bool {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	if _, ok := m.data[k]; ok {
@@ -35,10 +35,8 @@ func (m *Map)Has(k string) bool {
 	return false
 }
 
-func (m *Map)Count() int {
+func (m *Map) Count() int {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	return len(m.data)
 }
-
-

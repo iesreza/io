@@ -22,6 +22,7 @@ type Network struct {
 
 var instance *Network
 
+// RefreshConfig refetch network configuration
 func RefreshConfig() (*Network, error) {
 	if instance != nil {
 		instance = nil
@@ -29,7 +30,7 @@ func RefreshConfig() (*Network, error) {
 	return GetConfig()
 }
 
-// GetNetworkConfig create instance of network configuration.
+// GetConfig return  instance of network configuration.
 func GetConfig() (*Network, error) {
 	if instance != nil {
 		return instance, nil

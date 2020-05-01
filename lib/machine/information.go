@@ -19,6 +19,7 @@ import (
 	"unicode"
 )
 
+// DiskDrive disk drive info struct
 type DiskDrive struct {
 	Caption      string `json:"name"`
 	DeviceID     string `json:"device_id"`
@@ -29,6 +30,7 @@ type DiskDrive struct {
 	Active       bool   `json:"active"`
 }
 
+// Partition partition info struct
 type Partition struct {
 	Name               string  `json:"name" csv:"DeviceID"`
 	FileSystem         string  `json:"file_system"`
@@ -40,6 +42,7 @@ type Partition struct {
 	Active             bool    `json:"active"`
 }
 
+// Memory memory information
 type Memory struct {
 	Total       uint64
 	Free        uint64
@@ -47,11 +50,13 @@ type Memory struct {
 	UsedPercent float64
 }
 
+// CPU cpu information
 type CPU struct {
 	Cores []float64
 	Total float64
 }
 
+// UniqueHwID generates unique hardware id
 func UniqueHwID() (string, error) {
 	netconfig, _ := network.GetConfig()
 	mac := netconfig.HardwareAddress.String()
@@ -103,6 +108,7 @@ func UniqueHwID() (string, error) {
 	return hwid, nil
 }
 
+// GetBiosId get bios id
 func GetBiosId() (string, error) {
 
 	if runtime.GOOS == "windows" {
@@ -125,6 +131,7 @@ func GetBiosId() (string, error) {
 
 }
 
+// GetActiveHddSerial get active hard disk serial
 func GetActiveHddSerial() (string, error) {
 	drive := GetActiveHardDisk()
 	if drive.DeviceID == "" {
@@ -134,6 +141,7 @@ func GetActiveHddSerial() (string, error) {
 	return drive.SerialNumber, nil
 }
 
+// GetHardDisks get list of hard disks
 func GetHardDisks() ([]DiskDrive, error) {
 	if runtime.GOOS == "windows" {
 		res, err := exec.Command("cmd", "/C", `wmic DiskDrive get Caption,DeviceID,Model,Partitions,Size,SerialNumber /format:csv`).CombinedOutput()
@@ -231,6 +239,7 @@ func GetHardDisks() ([]DiskDrive, error) {
 	return []DiskDrive{}, nil
 }
 
+// GetActiveHardDisk get active hard disk
 func GetActiveHardDisk() DiskDrive {
 	hdds, _ := GetHardDisks()
 
@@ -243,6 +252,7 @@ func GetActiveHardDisk() DiskDrive {
 	return DiskDrive{}
 }
 
+// GetPartitions get list of partitions
 func GetPartitions() ([]Partition, error) {
 	partitions := []Partition{}
 	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
@@ -315,6 +325,7 @@ func GetPartitions() ([]Partition, error) {
 
 }
 
+// GetActivePartition get active partition
 func GetActivePartition() (Partition, error) {
 	partitions, err := GetPartitions()
 	if err == nil {
@@ -327,6 +338,7 @@ func GetActivePartition() (Partition, error) {
 	return Partition{}, fmt.Errorf("unable to get active partition")
 }
 
+// GetMemory get memory information
 func GetMemory() (Memory, error) {
 	var response Memory
 	v, err := mem.VirtualMemory()
@@ -340,10 +352,12 @@ func GetMemory() (Memory, error) {
 	return response, nil
 }
 
+// GetCPUModel return cpu model
 func GetCPUModel() ([]cpu.InfoStat, error) {
 	return cpu.Info()
 }
 
+// GetCPU return cpu usage
 func GetCPU(interval time.Duration) (CPU, error) {
 	response := CPU{}
 	res, err := cpu.Percent(interval, true)

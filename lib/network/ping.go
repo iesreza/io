@@ -10,11 +10,13 @@ import (
 	"strings"
 )
 
+// PingResult ping result struct
 type PingResult struct {
 	Min, Max, Avg, Loss, Dev int
 	Resolved                 bool
 }
 
+// String return ping result in string
 func (result PingResult) String() string {
 	if !result.Resolved {
 		return "Timed out"
@@ -26,6 +28,7 @@ func (result PingResult) String() string {
 var windowsPingRegex = regexp.MustCompile(`(?s)(\d+)%\s*loss.*Minimum\s*=\s*(\d+).*Maximum\s*=\s*(\d+).*Average\s*=\s*(\d+).*`)
 var linuxPingRegex = regexp.MustCompile(`(?s)(\d+)%\s*packet loss.*rtt.*mdev = (\d+).*?\/(\d+).*?\/(\d+)`)
 
+// Ping ping destination return the info
 func Ping(host string, pings int) (PingResult, error) {
 	var result PingResult
 	if runtime.GOOS == "windows" {

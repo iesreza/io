@@ -5,7 +5,6 @@ import (
 	"testing"
 )
 
-
 type B struct {
 	RN interface{}
 }
@@ -17,9 +16,8 @@ func TestGeneric(t *testing.T) {
 	s := M{}
 	s["A"] = r
 	s["B"] = &r
-	s["c"] = B {r,}
-	s["d"] = B {&r,}
-
+	s["c"] = B{r}
+	s["d"] = B{&r}
 
 	Generic(&s)
 	fmt.Println(s["c"].(B).RN)

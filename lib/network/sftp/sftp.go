@@ -18,6 +18,7 @@ const (
 	UPLOAD_CONTINUE       UploadAction = 2
 )
 
+// SFTP sftp struct
 type SFTP struct {
 	Username        string
 	Password        string
@@ -31,6 +32,7 @@ type SFTP struct {
 	Timeout         time.Duration
 }
 
+// Connect connect to sftp server
 func (s *SFTP) Connect() error {
 	if s.HostKeyCallback == nil {
 		s.HostKeyCallback = ssh.InsecureIgnoreHostKey()
@@ -85,6 +87,7 @@ func (s *SFTP) interactivePassword(user, instruction string, questions []string,
 	return answers, nil
 }
 
+// ListDirectoryRecursive list directory info recursive
 func (s *SFTP) ListDirectoryRecursive(dir string) ([]string, error) {
 	var paths []string
 	w := s.Client.Walk(dir)
@@ -98,10 +101,13 @@ func (s *SFTP) ListDirectoryRecursive(dir string) ([]string, error) {
 	return paths, nil
 }
 
+// Close close connection
 func (s *SFTP) Close() {
 	s.Client.Close()
 	s.Connection.Close()
 }
+
+// ListDirectory list directory
 func (s *SFTP) ListDirectory(dir string) ([]os.FileInfo, error) {
 	list, err := s.Client.ReadDir(dir)
 	if err != nil {
@@ -111,6 +117,7 @@ func (s *SFTP) ListDirectory(dir string) ([]os.FileInfo, error) {
 	return list, nil
 }
 
+// Download download a file
 func (s *SFTP) Download(remote, local string) (int64, error) {
 	dstFile, err := os.Create(local)
 	if err != nil {
@@ -138,10 +145,12 @@ func (s *SFTP) Download(remote, local string) (int64, error) {
 	return bytes, nil
 }
 
+// Stat return file info
 func (s *SFTP) Stat(path string) (os.FileInfo, error) {
 	return s.Client.Lstat(path)
 }
 
+// Delete deletes a file
 func (s *SFTP) Delete(path string) error {
 	stat, err := s.Client.Lstat(path)
 	if err != nil {
@@ -153,11 +162,13 @@ func (s *SFTP) Delete(path string) error {
 	return s.Client.Remove(path)
 }
 
+// Exist check if file is exist
 func (s *SFTP) Exist(path string) bool {
 	_, err := s.Client.Lstat(path)
 	return err == nil
 }
 
+// Upload upload a local file to sftp
 func (s *SFTP) Upload(local, remote string, overwrite UploadAction) (int64, error) {
 	remote_tmp := remote + "_tmp"
 	var err error

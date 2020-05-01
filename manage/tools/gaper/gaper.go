@@ -10,14 +10,14 @@ import (
 	"syscall"
 	"time"
 
-	shellwords "github.com/mattn/go-shellwords"
+	"github.com/mattn/go-shellwords"
 )
 
 // DefaultBuildPath is the default build and watched path
 var DefaultBuildPath = "."
 
 // DefaultExtensions is the default watched extension
-var DefaultExtensions = []string{"go","yml"}
+var DefaultExtensions = []string{"go", "yml"}
 
 // DefaultPoolInterval is the time in ms used by the watcher to wait between scans
 var DefaultPoolInterval = 500

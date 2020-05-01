@@ -19,7 +19,7 @@ type file struct {
 	tests      string
 }
 
-// Open opens a file to proccess
+// Open opens a file
 func Open(path string) (*file, error) {
 	f := file{timeout: DefaultTimeout, path: path}
 	var err error

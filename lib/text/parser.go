@@ -6,20 +6,20 @@ import (
 	"strings"
 )
 
-func ParseWildCard(input,expr string) []string {
+func ParseWildCard(input, expr string) []string {
 	i := 0
-	for _,item := range expr{
-		if item == '*'{
+	for _, item := range expr {
+		if item == '*' {
 			i++
 		}
 	}
-	expr = strings.Replace(expr,"*","(.+)",-1)
+	expr = strings.Replace(expr, "*", "(.+)", -1)
 	r := regexp.MustCompile(expr)
-	res := r.FindAllStringSubmatch(input,1)
-	if len(res) == 0 || len(res[0]) != i+1{
+	res := r.FindAllStringSubmatch(input, 1)
+	if len(res) == 0 || len(res[0]) != i+1 {
 		var empty []string
-		for j := 0 ; j < i; j++{
-			empty = append(empty,"")
+		for j := 0; j < i; j++ {
+			empty = append(empty, "")
 		}
 		return empty
 	}
@@ -27,7 +27,7 @@ func ParseWildCard(input,expr string) []string {
 }
 
 func ToJSON(v interface{}) string {
-	b,_ := json.Marshal(v)
+	b, _ := json.Marshal(v)
 	return string(b)
 }
 

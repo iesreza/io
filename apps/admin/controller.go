@@ -1,4 +1,3 @@
 package admin
 
-type Controller struct {}
-
+type Controller struct{}

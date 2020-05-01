@@ -4,6 +4,7 @@ import (
 	"net/http"
 )
 
+// HttpStatusCode return http status code of url
 func HttpStatusCode(url string) (int, error) {
 	resp, err := http.Get(url)
 	if err != nil {
