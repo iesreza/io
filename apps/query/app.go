@@ -10,6 +10,7 @@ import (
 
 var c Controller
 
+// Register register the auth in io apps
 func Register(v ...Filter) {
 	if len(v) == 0 {
 		io.Register(App{})
@@ -24,10 +25,12 @@ func Register(v ...Filter) {
 
 }
 
+// WhenReady called after setup all apps
 func (App) WhenReady() {}
 
 var db *gorm.DB
 
+// App query app struct
 type App struct{}
 
 func (App) Register() {
@@ -35,14 +38,15 @@ func (App) Register() {
 	db = io.GetDBO()
 }
 
-func (App) Router() {
+// Router setup routers
+func (App) Router() {}
 
-}
-
+// Permissions setup permissions of app
 func (App) Permissions() []user.Permission {
 	return []user.Permission{}
 }
 
+// Menus setup menus
 func (App) Menus() []menu.Menu {
 	return []menu.Menu{}
 }

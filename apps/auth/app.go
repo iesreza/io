@@ -16,8 +16,10 @@ func Register() {
 var db *gorm.DB
 var config *io.Configuration
 
+// App settings app struct
 type App struct{}
 
+// Register register the auth in io apps
 func (App) Register() {
 
 	fmt.Println("Auth Registered")
@@ -42,6 +44,7 @@ func (App) Register() {
 	}
 }
 
+// Router setup routers
 func (App) Router() {
 	controller := Controller{}
 
@@ -70,6 +73,7 @@ func (App) Router() {
 
 }
 
+// Permissions setup permissions of app
 func (App) Permissions() []user.Permission {
 	return []user.Permission{
 		{Title: "Access Users", CodeName: "user.view", Description: "Access list to view list of users"},
@@ -89,7 +93,10 @@ func (App) Permissions() []user.Permission {
 	}
 }
 
+// Menus setup menus
 func (App) Menus() []menu.Menu {
 	return []menu.Menu{}
 }
+
+// WhenReady called after setup all apps
 func (App) WhenReady() {}

@@ -13,19 +13,24 @@ import (
 	"github.com/iesreza/io/user"
 )
 
+// Register register the admin in io apps
 func Register() {
 	fmt.Println("Dashboard Registered")
 	io.Register(App{})
 }
 
 var db = io.GetDBO()
+
+//Path to admin app
 var Path string
 
+// App admin app struct
 type App struct{}
 
 var views *jet.Set
 var setting Settings
 
+// Register register the app
 func (App) Register() {
 	//Require auth
 	setting.SessionAge = fmt.Sprint(io.GetConfig().JWT.Age.Seconds())
@@ -35,6 +40,7 @@ func (App) Register() {
 	settings.Register("Admin Panel", &setting)
 }
 
+// Router setup routers
 func (App) Router() {
 	io.Get("/admin/login", func(ctx *fiber.Ctx) {
 		r := io.Upgrade(ctx)
@@ -47,6 +53,7 @@ func (App) Router() {
 	})
 }
 
+// Permissions setup permissions of app
 func (App) Permissions() []user.Permission {
 	return []user.Permission{
 		{Title: "Login to admin", CodeName: "login", Description: "Able login to admin panel"},
@@ -54,6 +61,7 @@ func (App) Permissions() []user.Permission {
 	}
 }
 
+// Menus setup menus
 func (App) Menus() []menu.Menu {
 	return []menu.Menu{
 		{Title: "Dashboard", Url: "admin/dashboard", Icon: fontawesome.Home},
@@ -63,4 +71,6 @@ func (App) Menus() []menu.Menu {
 		}},
 	}
 }
+
+// WhenReady called after setup all apps
 func (App) WhenReady() {}

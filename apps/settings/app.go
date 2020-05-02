@@ -20,10 +20,12 @@ var config *io.Configuration
 var views *jet.Set
 var Path string
 
+// App settings app struct
 type App struct{}
 
 var initiated = false
 
+// Register register the auth in io apps
 func Register(v ...interface{}) {
 	if len(v) == 0 {
 		io.Register(App{})
@@ -52,6 +54,7 @@ func Register(v ...interface{}) {
 
 }
 
+// Register settings app
 func (App) Register() {
 	fmt.Println("Settings Registered")
 	settings.Init()
@@ -66,6 +69,7 @@ func (App) Register() {
 	db.AutoMigrate(&Settings{})
 }
 
+// Router setup routers
 func (App) Router() {
 	controller := Controller{}
 	io.Get("admin/settings", controller.view)
@@ -73,6 +77,7 @@ func (App) Router() {
 	io.Post("admin/settings/reset/:name", controller.reset)
 }
 
+// Permissions setup permissions of app
 func (App) Permissions() []user.Permission {
 	return []user.Permission{
 		{Title: "Access Settings", CodeName: "view", Description: "Access list to view list of settings"},
@@ -80,9 +85,12 @@ func (App) Permissions() []user.Permission {
 	}
 }
 
+// Menus setup menus
 func (App) Menus() []menu.Menu {
 	return []menu.Menu{
 		{Title: "Settings", Url: "admin/settings", Permission: "settings.view", Icon: fontawesome.Cog},
 	}
 }
+
+// WhenReady called after setup all apps
 func (App) WhenReady() {}

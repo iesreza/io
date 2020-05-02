@@ -12,12 +12,15 @@ import (
 	"github.com/iesreza/io/viewfn"
 )
 
+// Register register the adminlte in io apps
 func Register() {
 	io.Register(App{})
 }
 
+//Path to adminlte app
 var Path string
 
+// App adminlte app struct
 type App struct{}
 
 var setting = &Settings{
@@ -29,6 +32,7 @@ var pages *jet.Set
 var elements *jet.Set
 var config *io.Configuration
 
+// Register the adminlte
 func (App) Register() {
 	fmt.Println("AdminLTE Registered")
 	Path = gpath.Parent(gpath.WorkingDir()) + "/apps/adminlte"
@@ -39,6 +43,7 @@ func (App) Register() {
 
 }
 
+// WhenReady called after setup all apps
 func (App) WhenReady() {
 	pages.AddGlobal("title", config.App.Name)
 	pages.AddGlobal("nav", io.AppMenus)
@@ -46,6 +51,7 @@ func (App) WhenReady() {
 	viewfn.Bind(pages, "thumb")
 }
 
+// Router setup routers
 func (App) Router() {
 	io.Static("/assets", Path+"/assets")
 	io.Static("/plugins", Path+"/plugins")
@@ -68,8 +74,11 @@ func (App) Router() {
 		r.View(nil, "template.default")
 	})
 }
+
+// Permissions setup permissions of app
 func (App) Permissions() []user.Permission { return []user.Permission{} }
 
+// Menus setup menus
 func (App) Menus() []menu.Menu {
 	return []menu.Menu{}
 }
