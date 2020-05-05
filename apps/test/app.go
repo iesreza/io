@@ -3,7 +3,6 @@ package test
 import (
 	"fmt"
 	"github.com/CloudyKit/jet"
-	"github.com/gofiber/fiber"
 	"github.com/iesreza/io"
 	"github.com/iesreza/io/lib"
 	"github.com/iesreza/io/lib/gpath"
@@ -29,14 +28,11 @@ func (App) Register() {
 	//Require auth
 	db = io.GetDBO()
 	Path = gpath.Parent(gpath.WorkingDir()) + "/apps/test"
-
+	views = io.RegisterView("test", Path+"/views")
 }
 
 func (App) Router() {
-	io.Get("/admin/list", func(ctx *fiber.Ctx) {
-		r := io.Upgrade(ctx)
-		r.View(nil, "test.list", "template.login")
-	})
+	io.Get("/admin/list", FilterViewController)
 
 }
 

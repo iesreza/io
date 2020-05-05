@@ -1,0 +1,16 @@
+<table>
+	<tr>
+		<thead>
+			{{range param.Columns}}
+				<th{{ if .Width > 0}} width="{{.Width}}%"{{end}}>{{.Title}}</th>
+            {{end}}
+		</thead>
+	</tr>
+	<tr>
+    	<thead>
+    		{{range param.Columns}}
+    			<td>{{.Filter(request)|raw}}</td>
+            {{end}}
+    	</thead>
+    </tr>
+</table>

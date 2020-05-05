@@ -125,24 +125,31 @@ func (r *Request) Persist() {
 	}
 }
 
-func (r *Request) View(data map[string]interface{}, views ...string) {
+func (r *Request) View(data interface{}, views ...string) {
 	buff := r.RenderView(data, views...)
 	buff.Bytes()
 	r.SendHTML(buff.Bytes())
 }
 
-func (r *Request) RenderView(data map[string]interface{}, views ...string) *bytes.Buffer {
+func (r *Request) RenderView(input interface{}, views ...string) *bytes.Buffer {
 	var buff bytes.Buffer
 	vars := jet.VarMap{}
 	vars.Set("base", r.Context.Protocol()+"://"+r.Context.Hostname())
 	vars.Set("proto", r.Context.Protocol())
 	vars.Set("hostname", r.Context.Hostname())
 	vars.Set("request", r)
-	if data != nil {
-		for k, v := range data {
-			vars.Set(k, v)
+	ref := reflect.ValueOf(input)
+	kind := ref.Kind()
+	if kind == reflect.Map {
+		for _, k := range ref.MapKeys() {
+			vars.Set(k.String(), ref.MapIndex(k).Interface())
 		}
+	} else if kind == reflect.String {
+		vars.Set("body", input.(string))
+	} else {
+		vars.Set("param", input)
 	}
+
 	for k, v := range r.Variables {
 		vars.Set(k, v)
 	}
