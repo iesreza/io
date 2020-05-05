@@ -21,7 +21,7 @@ import (
 
 var (
 	//Public
-	app             *fiber.Fiber
+	app             *fiber.App
 	Sessions        *session.Session
 	Events          = event.New()
 	StatusCodePages = map[int]string{}
@@ -159,6 +159,6 @@ func Run() {
 }
 
 // GetApp return fiber instance
-func GetApp() *fiber.Fiber {
+func GetApp() *fiber.App {
 	return app
 }

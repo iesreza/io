@@ -20,7 +20,7 @@ func Static(prefix, path string) {
 // Use registers a middleware route.
 // Middleware matches requests beginning with the provided prefix.
 // Providing a prefix is optional, it defaults to "/"
-func Use(args ...interface{}) *fiber.Fiber {
+func Use(args ...interface{}) *fiber.App {
 	if app == nil {
 		panic("Access object before call Setup()")
 	}
@@ -28,7 +28,7 @@ func Use(args ...interface{}) *fiber.Fiber {
 }
 
 // Connect : https://fiber.wiki/application#http-methods
-func Connect(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
+func Connect(path string, handlers ...func(*fiber.Ctx)) *fiber.App {
 	if app == nil {
 		panic("Access object before call Setup()")
 	}
@@ -36,7 +36,7 @@ func Connect(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 }
 
 // Put : https://fiber.wiki/application#http-methods
-func Put(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
+func Put(path string, handlers ...func(*fiber.Ctx)) *fiber.App {
 	if app == nil {
 		panic("Access object before call Setup()")
 	}
@@ -44,7 +44,7 @@ func Put(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 }
 
 // Post : https://fiber.wiki/application#http-methods
-func Post(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
+func Post(path string, handlers ...func(*fiber.Ctx)) *fiber.App {
 	if app == nil {
 		panic("Access object before call Setup()")
 	}
@@ -52,7 +52,7 @@ func Post(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 }
 
 // Delete : https://fiber.wiki/application#http-methods
-func Delete(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
+func Delete(path string, handlers ...func(*fiber.Ctx)) *fiber.App {
 	if app == nil {
 		panic("Access object before call Setup()")
 	}
@@ -60,7 +60,7 @@ func Delete(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 }
 
 // Head : https://fiber.wiki/application#http-methods
-func Head(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
+func Head(path string, handlers ...func(*fiber.Ctx)) *fiber.App {
 	if app == nil {
 		panic("Access object before call Setup()")
 	}
@@ -68,7 +68,7 @@ func Head(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 }
 
 // Patch : https://fiber.wiki/application#http-methods
-func Patch(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
+func Patch(path string, handlers ...func(*fiber.Ctx)) *fiber.App {
 	if app == nil {
 		panic("Access object before call Setup()")
 	}
@@ -76,7 +76,7 @@ func Patch(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 }
 
 // Options : https://fiber.wiki/application#http-methods
-func Options(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
+func Options(path string, handlers ...func(*fiber.Ctx)) *fiber.App {
 	if app == nil {
 		panic("Access object before call Setup()")
 	}
@@ -84,7 +84,7 @@ func Options(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 }
 
 // Trace : https://fiber.wiki/application#http-methods
-func Trace(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
+func Trace(path string, handlers ...func(*fiber.Ctx)) *fiber.App {
 	if app == nil {
 		panic("Access object before call Setup()")
 	}
@@ -92,7 +92,7 @@ func Trace(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 }
 
 // Get : https://fiber.wiki/application#http-methods
-func Get(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
+func Get(path string, handlers ...func(*fiber.Ctx)) *fiber.App {
 	if app == nil {
 		panic("Access object before call Setup()")
 	}
@@ -100,7 +100,7 @@ func Get(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
 }
 
 // All : https://fiber.wiki/application#http-methods
-func All(path string, handlers ...func(*fiber.Ctx)) *fiber.Fiber {
+func All(path string, handlers ...func(*fiber.Ctx)) *fiber.App {
 	if app == nil {
 		panic("Access object before call Setup()")
 	}
