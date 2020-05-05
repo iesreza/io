@@ -10,19 +10,17 @@ import (
 	"github.com/gofiber/logger"
 	recovermd "github.com/gofiber/recover"
 	"github.com/gofiber/requestid"
-	"github.com/gofiber/session"
 	"github.com/iesreza/io/lib/gpath"
 	"github.com/iesreza/io/lib/jwt"
 	"github.com/iesreza/io/lib/text"
 	"github.com/iesreza/io/lib/utils"
 	"github.com/iesreza/io/user"
-	"time"
 )
 
 var (
 	//Public
-	app             *fiber.App
-	Sessions        *session.Session
+	app *fiber.App
+
 	Events          = event.New()
 	StatusCodePages = map[int]string{}
 
@@ -94,10 +92,6 @@ func Setup() {
 		app.Use(requestid.New())
 	}
 
-	Sessions = session.New(session.Config{
-		Expires: time.Duration(config.App.SessionAge) * time.Minute,
-		Secure:  true,
-	})
 	Static("/", config.App.Static)
 	//app.Settings.TemplateEngine = template.Handlebars()
 

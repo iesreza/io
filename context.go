@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/CloudyKit/jet"
 	"github.com/gofiber/fiber"
-	"github.com/gofiber/session"
 	"github.com/iesreza/io/errors"
 	"github.com/iesreza/io/lib/jwt"
 	"github.com/iesreza/io/lib/log"
@@ -18,7 +17,6 @@ import (
 
 type Request struct {
 	Variables fiber.Map
-	Session   *session.Store
 	Context   *fiber.Ctx
 	JWT       *jwt.Payload
 	User      *user.User
@@ -43,7 +41,6 @@ func (response Response) HasError() bool {
 func Upgrade(ctx *fiber.Ctx) *Request {
 	r := Request{}
 	r.Variables = fiber.Map{}
-	r.Session = Sessions.Start(ctx)
 	r.Context = ctx
 	r.Response = Response{}
 	r.Response.Error = e.Errors{}
@@ -103,7 +100,6 @@ func (r *Request) Flash(params ...string) {
 }
 
 func (r *Request) Persist() {
-	r.Session.Save(r.Context, r.Session)
 	if !r.JWT.Empty {
 		exp := time.Now().Add(config.JWT.Age)
 		if d, exist := r.JWT.Get("_extend_duration"); exist {
