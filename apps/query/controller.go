@@ -74,6 +74,7 @@ func (Controller) Route(c *fiber.Ctx) {
 		values := filter.values
 		var limit int
 		var offset int
+		var order string
 		for k, v := range post {
 			if k == "offset" {
 				offset = T.Must(v).Int()
@@ -83,7 +84,10 @@ func (Controller) Route(c *fiber.Ctx) {
 				limit = T.Must(v).Int()
 				continue
 			}
-
+			if k == "order" {
+				order = sanitize.String(fmt.Sprint(v))
+				continue
+			}
 			valueType := reflect.ValueOf(v).Type().String()
 			slice := strings.Split(k, "_")
 			if len(slice) > 0 {
@@ -200,7 +204,11 @@ func (Controller) Route(c *fiber.Ctx) {
 		if offset < 0 {
 			offset = 0
 		}
-		db.Unscoped().Offset(offset).Limit(limit).Where(cond, values...).Find(data)
+		query := db.Unscoped().Offset(offset).Limit(limit).Where(cond, values...)
+		if order != "" {
+			query.Order(order)
+		}
+		query.Find(data)
 		r.WriteResponse(data)
 		return
 	}
