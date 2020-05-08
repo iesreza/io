@@ -1,4 +1,4 @@
-<table>
+<table {{ param.Atrributes.Render() }} >
 	<tr>
 		<thead>
 			{{range param.Columns}}

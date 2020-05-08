@@ -24,12 +24,6 @@ type AuthParams struct {
 	Redirect string `json:"redirect" form:"redirect"`
 }
 
-type Response struct {
-	Success bool        `json:"success"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
-}
-
 func GetUserByID(id interface{}) *user.User {
 	user := user.User{}
 	if db.Where("id = ?", id).Find(&user).RecordNotFound() {
@@ -144,7 +138,6 @@ func (c Controller) Login(ctx *fiber.Ctx) {
 func (c Controller) CreateUser(ctx *fiber.Ctx) {
 
 	var r = io.Upgrade(ctx)
-	fmt.Println(r.User.Roles)
 	if !r.User.HasPerm("auth.create.user") {
 		r.WriteResponse(constant.ERROR_UNAUTHORIZED)
 		return

@@ -32,6 +32,7 @@ type Response struct {
 	Message string      `json:"message"`
 	Error   e.Errors    `json:"errors"`
 	Data    interface{} `json:"data"`
+	Code    int         `json:"code"`
 }
 
 func (response Response) HasError() bool {
@@ -208,6 +209,13 @@ func (r *Request) WriteResponse(resp ...interface{}) {
 			break
 		case reflect.Bool:
 			r.Response.Success = item.(bool)
+			break
+		case reflect.Int32:
+			if r.Response.Code == 0 {
+				r.Response.Code = item.(int)
+			} else {
+				r.Response.Data = item.(int)
+			}
 			break
 		case reflect.String:
 			if !message {

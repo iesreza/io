@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/AlexanderGrom/go-event"
+	swagger "github.com/arsmn/fiber-swagger"
 	"github.com/gofiber/cors"
 	"github.com/gofiber/fiber"
 	"github.com/gofiber/limiter"
@@ -81,6 +82,8 @@ func Setup() {
 				},
 			}))
 		}
+
+		app.Use("/swagger", swagger.Handler) // default
 	} else {
 		if config.Server.Recover {
 			app.Use(recovermd.New())

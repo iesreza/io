@@ -16,3 +16,7 @@ func (attrs Attributes) Render() string {
 	}
 	return res
 }
+
+func (attrs Attributes) Set(key string, value interface{}) {
+	attrs[key] = value
+}

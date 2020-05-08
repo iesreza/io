@@ -35,10 +35,15 @@ type FilterView struct {
 	Columns []Column
 	Model   interface{}
 	Join    string
+	Attribs html.Attributes
 }
 
 func (fv FilterView) Render() string {
 	return "abcd"
+}
+
+func (fv FilterView) Prepare(r io.Request) {
+	fv.Attribs.Render()
 }
 
 func (col Column) Filter(r *io.Request) string {
@@ -79,6 +84,8 @@ func FilterViewController(ctx *fiber.Ctx) {
 		},
 		Model: MyModel{},
 	}
+
+	fv.Prepare()
 
 	r.View(fv, "test.list")
 

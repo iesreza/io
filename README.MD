@@ -36,6 +36,17 @@ IO is a powerful package for quickly writing modular web applications/services i
 ## Todo
 - i18n
 - User Management app
+- List filter ui
+- Journal App
+- Log App
+- Swagger
+- Documentation (WIKI)
+- Sample Apps
+- Clear Libraries
+- Improve Manager
+- Keycloak login
+- Social Login
+- Websocket integration
 
 ## Shoulders of Giants
 IO stands on shoulder of great projects or inspired by them.
