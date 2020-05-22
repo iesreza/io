@@ -23,6 +23,7 @@ type App struct{}
 func (App) Register() {
 
 	fmt.Println("Auth Registered")
+
 	userFilter := query.Filter{
 		Object: &user.User{},
 		Slug:   "user",
@@ -35,6 +36,7 @@ func (App) Register() {
 			"created_at": `validate:"format=date"`,
 		},
 	}
+	//userFilter.SetFilter("admin = ?",false)
 	query.Register(userFilter)
 
 	db = io.GetDBO()

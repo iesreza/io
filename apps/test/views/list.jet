@@ -1,4 +1,4 @@
-<table {{ param.Atrributes.Render() }} >
+<table {{ param.Attribs.Render() }} >
 	<tr>
 		<thead>
 			{{range param.Columns}}
@@ -9,7 +9,7 @@
 	<tr>
     	<thead>
     		{{range param.Columns}}
-    			<td>{{.Filter(request)|raw}}</td>
+    			<td>{{.Filter(request).Render()|raw}}</td>
             {{end}}
     	</thead>
     </tr>

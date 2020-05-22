@@ -206,6 +206,8 @@ func (Controller) Route(c *fiber.Ctx) {
 		if offset < 0 {
 			offset = 0
 		}
+
+		fmt.Println(cond)
 		query := db.Unscoped().Offset(offset).Limit(limit).Where(cond, values...)
 		if order != "" {
 			query = query.Order(order)

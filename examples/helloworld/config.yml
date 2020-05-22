@@ -57,7 +57,7 @@ log:
 #Tweaks
 tweaks:
   ballast: true
-  ballast-size: 100mb
+  ballast-size: 2GB
   processors: 0
   prefork: false
 
