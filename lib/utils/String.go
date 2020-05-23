@@ -226,3 +226,13 @@ func ParseSize(expr string) (int64, error) {
 	}
 	return 0, fmt.Errorf("unable to parse size: %s", expr)
 }
+
+func ReplaceArray(input string, needles []string, replace []string) string {
+	if len(needles) != len(replace) {
+		return input
+	}
+	for k, needle := range needles {
+		input = strings.Replace(input, needle, replace[k], -1)
+	}
+	return input
+}

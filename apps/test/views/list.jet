@@ -1,16 +1,23 @@
 <table {{ param.Attribs.Render() }} >
+	<thead>
 	<tr>
-		<thead>
-			{{range param.Columns}}
-				<th{{ if .Width > 0}} width="{{.Width}}%"{{end}}>{{.Title}}</th>
-            {{end}}
-		</thead>
+		{{range param.Columns}}
+			<th{{ if .Width > 0}} width="{{.Width}}%"{{end}}>{{.Title}}</th>
+        {{end}}
 	</tr>
 	<tr>
-    	<thead>
-    		{{range param.Columns}}
-    			<td>{{.Filter(request).Render()|raw}}</td>
-            {{end}}
-    	</thead>
+    	{{range param.Columns}}
+    		<td>{{.Filter(request).Render()|raw}}</td>
+        {{end}}
     </tr>
+    </thead>
+    <tbody>
+        {{range row := param.GetData()}}
+                <tr>
+            	{{range column := param.Columns}}
+            	    <td>{{column.Processor(column.Name,row,request)|raw}}</td>
+            	{{end}}
+            	</tr>
+        {{end}}
+	</tbody>
 </table>
