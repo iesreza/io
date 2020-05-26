@@ -15,6 +15,10 @@ type KeyValue struct {
 	Value interface{}
 }
 
+type Renderable interface {
+	Render() string
+}
+
 type InputStruct struct {
 	Type       string
 	Label      string

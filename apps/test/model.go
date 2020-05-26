@@ -12,3 +12,8 @@ type MyModel struct {
 	Type     int
 	Alias    string
 }
+
+type MyGroup struct {
+	io.Model
+	Name string
+}

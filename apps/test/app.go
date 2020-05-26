@@ -45,7 +45,7 @@ func (App) Menus() []menu.Menu {
 }
 func (App) WhenReady() {
 
-	db.AutoMigrate(MyModel{})
+	db.AutoMigrate(MyModel{}, MyGroup{})
 	for i := 0; i < 20; i++ {
 		item := MyModel{}
 		item.Username = text.Random(6)
@@ -55,4 +55,14 @@ func (App) WhenReady() {
 		item.Alias = text.Random(4)
 		db.Create(&item)
 	}
+
+	/*	db.Debug().Create(&MyGroup{
+			Name:"Group 1",
+		})
+		db.Debug().Create(&MyGroup{
+			Name:"Group 2",
+		})
+		db.Debug().Create(&MyGroup{
+			Name:"Group 3",
+		})*/
 }

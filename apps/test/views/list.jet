@@ -1,4 +1,4 @@
-<table {{ param.Attribs.Render() }} >
+<table class="table table-bordered table-striped dataTable dtr-inline" {{ param.Attribs.Render() }} >
 	<thead>
 	<tr>
 		{{range param.Columns}}
@@ -15,7 +15,7 @@
         {{range row := param.GetData()}}
                 <tr>
             	{{range column := param.Columns}}
-            	    <td>{{column.Processor(column.Name,row,request)|raw}}</td>
+            	    <td>{{column.Processor(column,row,request)|raw}}</td>
             	{{end}}
             	</tr>
         {{end}}
