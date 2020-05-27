@@ -3,6 +3,7 @@ package io
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/CloudyKit/jet"
 	"github.com/gofiber/fiber"
 	"github.com/iesreza/io/errors"
@@ -10,6 +11,7 @@ import (
 	"github.com/iesreza/io/lib/log"
 	"github.com/iesreza/io/user"
 	"net/http"
+	"net/url"
 	"reflect"
 	"strings"
 	"time"
@@ -35,8 +37,40 @@ type Response struct {
 	Code    int         `json:"code"`
 }
 
+type URL struct {
+	Query  url.Values
+	Host   string
+	Scheme string
+	Path   string
+	Raw    string
+}
+
 func (response Response) HasError() bool {
 	return response.Error.Exist()
+}
+
+func (r *Request) URL() *URL {
+	u := URL{}
+	base := strings.Split(r.BaseURL(), "://")
+	u.Scheme = base[0]
+	u.Host = r.Hostname()
+	u.Raw = r.OriginalURL()
+	parts := strings.Split(u.Raw, "?")
+	if len(parts) == 1 {
+		u.Query = url.Values{}
+		u.Path = u.Raw
+	} else {
+		u.Path = parts[0]
+		u.Query, _ = url.ParseQuery(strings.Join(parts[1:], "?"))
+	}
+	return &u
+}
+func (u *URL) Set(key string, value interface{}) *URL {
+	u.Query.Set(key, fmt.Sprint(value))
+	return u
+}
+func (u *URL) String() string {
+	return u.Path + "?" + u.Query.Encode()
 }
 
 func Upgrade(ctx *fiber.Ctx) *Request {

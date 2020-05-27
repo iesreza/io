@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"github.com/CloudyKit/jet"
 	"github.com/iesreza/io"
-	"github.com/iesreza/io/lib"
 	"github.com/iesreza/io/lib/gpath"
-	"github.com/iesreza/io/lib/text"
 	"github.com/iesreza/io/menu"
 	"github.com/iesreza/io/user"
 	"github.com/jinzhu/gorm"
@@ -46,15 +44,6 @@ func (App) Menus() []menu.Menu {
 func (App) WhenReady() {
 
 	db.AutoMigrate(MyModel{}, MyGroup{})
-	for i := 0; i < 20; i++ {
-		item := MyModel{}
-		item.Username = text.Random(6)
-		item.Type = lib.RandomBetween(1, 3)
-		item.Name = text.Random(8)
-		item.Group = lib.RandomBetween(1, 4)
-		item.Alias = text.Random(4)
-		db.Create(&item)
-	}
 
 	/*	db.Debug().Create(&MyGroup{
 			Name:"Group 1",

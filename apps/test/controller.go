@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber"
 	"github.com/iesreza/io"
 	"github.com/iesreza/io/html"
+	"github.com/iesreza/io/lib/T"
 	"github.com/iesreza/io/lib/fontawesome"
 	"reflect"
 	"strings"
@@ -31,6 +32,7 @@ const (
 	SELECT  ColumnType = 5
 	CUSTOM  ColumnType = 6
 	ACTIONS ColumnType = 7
+	None    ColumnType = 8
 )
 
 type Join struct {
@@ -48,12 +50,22 @@ type Column struct {
 	Name         string
 	Alias        string
 	Options      []html.KeyValue
-	InputBuilder func(r *io.Request) *html.InputStruct
+	InputBuilder func(r *io.Request) html.Renderable
 	Attribs      html.Attributes
 	QueryBuilder func(r *io.Request) []string
 	SimpleFilter string
 	Processor    func(column Column, data map[string]interface{}, r *io.Request) string
 	Model        interface{}
+}
+
+type Pagination struct {
+	Records     int
+	CurrentPage int
+	Pages       int
+	Limit       int
+	First       int
+	Last        int
+	PageRange   []int
 }
 
 type FilterView struct {
@@ -65,6 +77,7 @@ type FilterView struct {
 	Unscoped     bool
 	QueryBuilder func(r *io.Request) []string
 	data         []map[string]interface{}
+	Pagination   Pagination
 }
 
 func (fv FilterView) GetData() []map[string]interface{} {
@@ -103,7 +116,44 @@ func (fv *FilterView) Prepare(r *io.Request) {
 	var _join string
 	var models = map[string]string{}
 	var tables []string
+	fv.Pagination.Limit = 10
+	var offset = 0
+	var order = ""
+	if r.Query("limit") != "" {
+		fv.Pagination.Limit = T.Must(r.Query("limit")).Int()
+		if fv.Pagination.Limit < 10 {
+			fv.Pagination.Limit = 10
+		}
+		if fv.Pagination.Limit > 100 {
+			fv.Pagination.Limit = 100
+		}
+	}
+	if r.Query("page") != "" {
+		fv.Pagination.CurrentPage = T.Must(r.Query("page")).Int() - 1
+		offset = fv.Pagination.CurrentPage * fv.Pagination.Limit
+		if offset < 0 {
+			offset = 0
+		}
+	}
+	s1 := r.Query("order")
+	if s1 != "" {
 
+		ok := false
+		for _, column := range fv.Columns {
+			if s1 == column.Name {
+				ok = true
+			}
+		}
+		if ok {
+			s2 := strings.ToUpper(r.Query("sort"))
+			if s2 == "ASC" || s2 == "DESC" {
+				order = s1 + " " + s2
+			} else {
+				order = s1 + " ASC"
+			}
+		}
+
+	}
 	tables = append(tables, db.NewScope(fv.Model).TableName())
 	for _, join := range fv.Join {
 		t := db.NewScope(join.Model).TableName()
@@ -131,33 +181,64 @@ func (fv *FilterView) Prepare(r *io.Request) {
 		}
 
 		if column.Name != "" {
-			fmt.Println(column.Model.(string))
 			_select = append(_select, column.Model.(string)+"."+quote(column.Name)+" AS "+quote(column.Alias))
 		}
 
 		if column.QueryBuilder != nil {
 			query = append(query, column.QueryBuilder(r)...)
 		} else {
-			v := r.FormValue(column.Name)
+			v := r.Get(column.Name)
 			if v != "" {
 				query = append(query, strings.Replace(column.SimpleFilter, "*", v, -1))
 			}
 		}
 	}
 
+	if order == "" {
+		order = quote(tables[0]) + ".\"id\" DESC"
+	}
 	db := io.GetDBO()
 	if fv.Unscoped {
 		db = db.Unscoped()
 	}
 
-	q := fmt.Sprintf("SELECT %s FROM %s %s WHERE %s",
+	dataQuery := fmt.Sprintf("SELECT %s FROM %s %s WHERE %s ORDER BY %s LIMIT %d OFFSET %d ",
 		strings.Join(_select, ","),
 		quote(tables[0]), //main table
 		_join,
 		strings.Join(query, " AND "),
+		order,
+		fv.Pagination.Limit,
+		offset,
 	)
-	fmt.Println(q)
-	rows, err := db.Raw(q).Rows()
+
+	limitQuery := fmt.Sprintf("SELECT COUNT(*) FROM %s %s WHERE %s",
+		quote(tables[0]), //main table
+		_join,
+		strings.Join(query, " AND "),
+	)
+	row := db.Raw(limitQuery).Row()
+	row.Scan(&fv.Pagination.Records)
+	fv.Pagination.Pages = fv.Pagination.Records / fv.Pagination.Limit
+	if fv.Pagination.Pages == 0 {
+		fv.Pagination.Pages = 1
+	}
+	fv.Pagination.First = fv.Pagination.CurrentPage * fv.Pagination.Limit
+	fv.Pagination.Last = fv.Pagination.First + fv.Pagination.Limit
+	if fv.Pagination.Last > fv.Pagination.Records {
+		fv.Pagination.Last = fv.Pagination.Records
+	}
+	to := fv.Pagination.CurrentPage + 5
+	if to > fv.Pagination.Pages {
+		to = fv.Pagination.Pages + 1
+	}
+	for i := fv.Pagination.CurrentPage - 2; i < to; i++ {
+		if i > 0 {
+			fv.Pagination.PageRange = append(fv.Pagination.PageRange, i)
+		}
+	}
+
+	rows, err := db.Raw(dataQuery).Rows()
 	if err != nil {
 		return
 	}
@@ -182,7 +263,6 @@ func (fv *FilterView) Prepare(r *io.Request) {
 		fv.data = append(fv.data, value)
 	}
 
-	fmt.Println(fv.data)
 }
 
 func makeResultReceiver(length int) []interface{} {
@@ -202,6 +282,9 @@ func (col Column) Filter(r *io.Request) html.Renderable {
 
 	var el *html.InputStruct
 	switch col.Type {
+	case None:
+		return html.Tag("div", "")
+		break
 	case NUMBER:
 		el = html.Input("number", col.Name, "")
 		el.SetAttr("onpressenter", "fv.filter(this)")
@@ -257,10 +340,12 @@ func (col Column) Filter(r *io.Request) html.Renderable {
 func FilterViewController(ctx *fiber.Ctx) {
 	r := io.Upgrade(ctx)
 	fv := FilterView{
+		Model: MyModel{},
 		Join: []Join{
 			{MyGroup{}, "group", "id"},
 		},
 		Columns: []Column{
+			{Type: None, Title: "ID", Name: "id"},
 			{Type: TEXT, Title: "Name", Name: "name", SimpleFilter: "name = '%*%'"},
 			{Type: TEXT, Title: "Username", Name: "username", SimpleFilter: "username = '%*%'"},
 			{Type: SELECT, Title: "Group", Model: MyGroup{}, Name: "name", Alias: "group", Options: []html.KeyValue{
@@ -276,11 +361,20 @@ func FilterViewController(ctx *fiber.Ctx) {
 			{Type: ACTIONS, Title: "Actions", Options: []html.KeyValue{
 				{SEARCH, html.Icon(fontawesome.Search)},
 				{RESET, html.Icon(fontawesome.Undo)},
-				{PAGESIZE, "Size:"},
 			},
+				Processor: func(column Column, data map[string]interface{}, r *io.Request) string {
+
+					return html.Render(
+
+						[]*html.Element{
+							html.Tag("a", "View").Set("class", "btn btn-success").Set("href", "#"),
+							html.Tag("a", "Delete").Set("class", "btn btn-danger").Set("href", "#"),
+						},
+					)
+
+				},
 			},
 		},
-		Model: MyModel{},
 	}
 
 	fv.Prepare(r)
