@@ -77,4 +77,39 @@
 	  var url = IO.URL()
 	  window.location = url.set(name,v).remove("page").build()
 	}
+
+	fv.setSize = function(el) {
+	  el = $(el)
+      var v = el.val()
+      var url = IO.URL()
+      url.query = {}
+      window.location = url.set("size",v).build()
+	}
+
+	fv.apply = function(el) {
+	  el = $(el)
+	  var v = el.val()
+      var url = IO.URL()
+      url.remove("page")
+      el.closest("tr").find("input,select").each(function() {
+        if($(this).val() != ""){
+            url.set($(this).attr("name"),$(this).val())
+        }
+        window.location = url.build()
+      })
+	}
+
+	fv.remove = function(el){
+	    el = $(el)
+	    var tr = el.closest("tr")
+	    tr.animate({opacity:0},"fast",function() {
+	      $(this).remove()
+	    }).css({"background":"#fba8a8"})
+	}
+
+	fv.reset = function() {
+	   var url = IO.URL()
+       url.query = {}
+       window.location = url.build()
+	}
 </script>

@@ -298,7 +298,7 @@ func (fv FilterView) SizeInput(r *io.Request) string {
 			{25, "25"},
 			{50, "50"},
 			{100, "100"},
-		}).SetValue(r.Query("size"))).Set("class", "btn fv-action-pagesize").Set("onclick", "fv.setSize(this)"))
+		}).SetAttr("onchange", "fv.setSize(this)").SetValue(r.Query("size"))).Set("class", "fv-action-pagesize"))
 }
 
 func (col Column) Filter(r *io.Request) html.Renderable {
@@ -331,18 +331,18 @@ func (col Column) Filter(r *io.Request) html.Renderable {
 			action := item.Key.(ActionType)
 			switch action {
 			case SEARCH:
-				actions = append(actions, *html.Tag("button", item.Value).Set("class", "btn fv-action-btn").Set("onclick", "fv.filter(this)"))
+				actions = append(actions, *html.Tag("button", item.Value).Set("class", "btn fv-action-btn").Set("onclick", "fv.apply(this)"))
 				break
 			case RESET:
 				actions = append(actions, *html.Tag("button", item.Value).Set("class", "btn fv-action-btn").Set("onclick", "fv.reset(this)"))
 				break
 			case PAGESIZE:
-				actions = append(actions, *html.Tag("div", html.Input("select", "size", fmt.Sprint(item.Value)).SetOptions([]html.KeyValue{
+				actions = append(actions, *html.Tag("div", html.Input("select", "size", fmt.Sprint(item.Value)).SetAttr("onchange", "fv.setSize(this)").SetOptions([]html.KeyValue{
 					{10, "10"},
 					{25, "25"},
 					{50, "50"},
 					{100, "100"},
-				})).Set("class", "btn fv-action-pagesize").Set("onclick", "fv.setSize(this)"))
+				})).Set("class", "fv-action-pagesize"))
 				break
 			}
 
@@ -403,7 +403,7 @@ func FilterViewController(ctx *fiber.Ctx) {
 
 						[]*html.Element{
 							html.Tag("a", "View").Set("class", "btn btn-success").Set("href", "#"),
-							html.Tag("a", "Delete").Set("class", "btn btn-danger").Set("href", "#"),
+							html.Tag("a", "Delete").Set("class", "btn btn-danger").Set("onclick", "fv.remove(this)").Set("href", "#"),
 						},
 					)
 
