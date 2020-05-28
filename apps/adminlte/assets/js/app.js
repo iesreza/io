@@ -71,6 +71,12 @@ App.Init = function () {
         }
     });
 
+    $("[onpressenter]").on('keypress', function (e) {
+        if (e.which == 13) {
+            eval($(this).attr("onpressenter"))
+        }
+    });
+
 }();
 
 App.Error = function (res) {

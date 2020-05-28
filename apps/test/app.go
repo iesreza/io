@@ -31,7 +31,6 @@ func (App) Register() {
 
 func (App) Router() {
 	io.Get("/admin/list", FilterViewController)
-
 }
 
 func (App) Permissions() []user.Permission {

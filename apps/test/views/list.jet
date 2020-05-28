@@ -30,7 +30,11 @@
 		</div>
 
 		<div class="row">
-			<div class="col-sm-12 col-md-5">
+
+
+
+			<div class="col-sm-8 col-md-5">
+				<div class="dataTables_length">Size: {{ param.SizeInput(request)|raw }}</div>
 				<div class="dataTables_info" role="status" aria-live="polite">Showing {{ param.Pagination.First }} to {{ param.Pagination.Last }} of {{ param.Pagination.Records }} entries</div>
 			</div>
 			<div class="col-sm-12 col-md-7">
@@ -63,3 +67,14 @@
 		</div>
 	</div>
 </div>
+
+<script>
+	var fv = {};
+	fv.filter = function(el) {
+	  el = $(el)
+	  var v = el.val()
+	  var name = el.attr("name")
+	  var url = IO.URL()
+	  window.location = url.set(name,v).remove("page").build()
+	}
+</script>

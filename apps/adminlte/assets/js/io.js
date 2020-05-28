@@ -2,6 +2,64 @@ var IO = {}
 
 IO.defaultCookieAttributes = { expires: 365, path:"", }
 
+IO.URL = function () {
+    return new URL()
+}
+
+class URL {
+    constructor(url) {
+        if (!url) {
+            this.raw = window.location.href.toString();
+            this.hostname = window.location.hostname
+            this.origin = window.location.origin
+            this.scheme = window.location.protocol.split(":")[0]
+            this.path = window.location.pathname
+            if (window.location.search) {
+                this.query = this.parseQuery(window.location.search.substring(1))
+            } else {
+                this.query = {}
+            }
+
+        } else {
+            this.raw = url
+        }
+
+    }
+
+    parseQuery(s) {
+        return JSON.parse('{"' + decodeURI(s.replace(/&/g, "\",\"").replace(/=/g, "\":\"")) + '"}')
+    }
+
+    set(key, val) {
+        this.query[key] = val
+        return this
+    }
+
+    remove(key, val) {
+        if (this.query.hasOwnProperty(key)) {
+            delete this.query[key]
+        }
+        return this
+    }
+
+    get(key) {
+        if (this.query.hasOwnProperty(key)) {
+            return this.query[key]
+        }
+        return false
+    }
+
+    build() {
+        var str = [];
+        for (var p in this.query)
+            if (this.query.hasOwnProperty(p)) {
+                str.push(encodeURIComponent(p) + "=" + encodeURIComponent(this.query[p]));
+            }
+        return this.raw.split("?")[0] + "?" + str.join("&");
+    }
+}
+
+
 /**
  * Initialize the IO preparations on each load
  */

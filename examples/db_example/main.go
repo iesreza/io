@@ -16,6 +16,7 @@ func main() {
 		fmt.Println("DB Examples Registered")
 
 		r := io.Upgrade(ctx)
+		r.Download()
 		//b = io.GetDBO()
 		/*type User struct {
 			username  	string

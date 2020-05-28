@@ -49,6 +49,7 @@ type Column struct {
 	Order        bool
 	Name         string
 	Alias        string
+	Select       string
 	Options      []html.KeyValue
 	InputBuilder func(r *io.Request) html.Renderable
 	Attribs      html.Attributes
@@ -155,6 +156,7 @@ func (fv *FilterView) Prepare(r *io.Request) {
 
 	}
 	tables = append(tables, db.NewScope(fv.Model).TableName())
+	models[getName(reflect.TypeOf(fv.Model))] = tables[0]
 	for _, join := range fv.Join {
 		t := db.NewScope(join.Model).TableName()
 		models[getName(reflect.TypeOf(join.Model))] = t
@@ -176,6 +178,7 @@ func (fv *FilterView) Prepare(r *io.Request) {
 		if column.Alias == "" {
 			column.Alias = column.Name
 		}
+
 		if column.Processor == nil {
 			fv.Columns[k].Processor = defaultProcessor
 		}
@@ -187,9 +190,20 @@ func (fv *FilterView) Prepare(r *io.Request) {
 		if column.QueryBuilder != nil {
 			query = append(query, column.QueryBuilder(r)...)
 		} else {
-			v := r.Get(column.Name)
+			var v string
+			if column.Select != "" {
+				v = r.Query(column.Select)
+			} else {
+				v = r.Query(column.Alias)
+			}
 			if v != "" {
-				query = append(query, strings.Replace(column.SimpleFilter, "*", v, -1))
+				q := column.SimpleFilter
+				for model, tb := range models {
+					q = strings.Replace(q, model+".", quote(tb)+".", -1)
+				}
+				q = strings.Replace(q, "*", v, -1)
+
+				query = append(query, q)
 			}
 		}
 	}
@@ -212,6 +226,7 @@ func (fv *FilterView) Prepare(r *io.Request) {
 		offset,
 	)
 
+	fmt.Println(dataQuery)
 	limitQuery := fmt.Sprintf("SELECT COUNT(*) FROM %s %s WHERE %s",
 		quote(tables[0]), //main table
 		_join,
@@ -275,6 +290,17 @@ func makeResultReceiver(length int) []interface{} {
 	return result
 }
 
+func (fv FilterView) SizeInput(r *io.Request) string {
+
+	return html.Render(
+		html.Tag("div", html.Input("select", "size", "").SetOptions([]html.KeyValue{
+			{10, "10"},
+			{25, "25"},
+			{50, "50"},
+			{100, "100"},
+		}).SetValue(r.Query("size"))).Set("class", "btn fv-action-pagesize").Set("onclick", "fv.setSize(this)"))
+}
+
 func (col Column) Filter(r *io.Request) html.Renderable {
 	if col.InputBuilder != nil {
 		return col.InputBuilder(r)
@@ -296,6 +322,9 @@ func (col Column) Filter(r *io.Request) html.Renderable {
 	case SELECT:
 		el = html.Input("select", col.Name, "").SetOptions(col.Options)
 		el.SetAttr("onchange", "fv.filter(this)")
+		el.Options = append([]html.KeyValue{
+			{"", "--------"},
+		}, el.Options...)
 	case ACTIONS:
 		var actions []html.Element
 		for _, item := range col.Options {
@@ -323,13 +352,19 @@ func (col Column) Filter(r *io.Request) html.Renderable {
 		el = html.Input("text", col.Name, "")
 		el.SetAttr("onpressenter", "fv.filter(this)")
 	}
+	if col.Select != "" {
+		el.SetName(col.Select)
+	}
+
 	if col.Attribs != nil {
 		el.Attributes = col.Attribs
 	}
 	if col.Title != "" {
 		el.Placeholder(col.Title)
 	}
-	if r.Query(col.Name) != "" {
+	if r.Query(col.Select) != "" {
+		el.Value = r.Query(col.Select)
+	} else if r.Query(col.Name) != "" {
 		el.Value = r.Query(col.Name)
 	} else {
 		el.Value = ""
@@ -346,14 +381,14 @@ func FilterViewController(ctx *fiber.Ctx) {
 		},
 		Columns: []Column{
 			{Type: None, Title: "ID", Name: "id"},
-			{Type: TEXT, Title: "Name", Name: "name", SimpleFilter: "name = '%*%'"},
-			{Type: TEXT, Title: "Username", Name: "username", SimpleFilter: "username = '%*%'"},
-			{Type: SELECT, Title: "Group", Model: MyGroup{}, Name: "name", Alias: "group", Options: []html.KeyValue{
-				{1, "Admin"},
-				{2, "Non Admin"},
-			}, SimpleFilter: "group = '*'",
+			{Type: TEXT, Title: "Name", Name: "name", SimpleFilter: "MyModel.name LIKE '%*%'"},
+			{Type: TEXT, Title: "Username", Name: "username", SimpleFilter: "username LIKE '%*%'"},
+			{Type: SELECT, Select: "group", Title: "Group", Model: MyGroup{}, Name: "name", Alias: "group", Options: []html.KeyValue{
+				{1, "Group 1"},
+				{2, "Group 2"},
+				{3, "Group 3"},
+			}, SimpleFilter: "MyModel.\"group\" = '*'",
 				Processor: func(column Column, data map[string]interface{}, r *io.Request) string {
-
 					return html.Tag("a", data["group"]).Set("href", "#").Render()
 				},
 			},
