@@ -102,9 +102,9 @@
 	fv.remove = function(el){
 	    el = $(el)
 	    var tr = el.closest("tr")
-	    tr.animate({opacity:0},"fast",function() {
+	    tr.animate({opacity:0,height:0},400,function() {
 	      $(this).remove()
-	    }).css({"background":"#fba8a8"})
+	    })
 	}
 
 	fv.reset = function() {
@@ -112,4 +112,5 @@
        url.query = {}
        window.location = url.build()
 	}
+
 </script>

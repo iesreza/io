@@ -155,7 +155,7 @@ func Run() {
 	panic(err)
 }
 
-// GetApp return fiber instance
-func GetApp() *fiber.App {
+// GetFiber return fiber instance
+func GetFiber() *fiber.App {
 	return app
 }

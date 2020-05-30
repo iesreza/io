@@ -52,6 +52,12 @@ func (App) Router() {
 
 	auth := io.Group("/auth")
 	//=>
+
+	// @doc api
+	// @doc login
+	// @doc path /auth/user/login
+	// @doc body Model:AuthParams
+	// @doc body Model:AuthParams
 	auth.Post("/user/login", controller.Login)
 
 	auth.Post("/user/create", controller.CreateUser)

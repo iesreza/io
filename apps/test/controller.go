@@ -403,7 +403,7 @@ func FilterViewController(ctx *fiber.Ctx) {
 
 						[]*html.Element{
 							html.Tag("a", "View").Set("class", "btn btn-success").Set("href", "#"),
-							html.Tag("a", "Delete").Set("class", "btn btn-danger").Set("onclick", "fv.remove(this)").Set("href", "#"),
+							html.Tag("a", "Delete").Set("class", "btn btn-danger").Set("onclick", "fv.remove(this)"),
 						},
 					)
 
